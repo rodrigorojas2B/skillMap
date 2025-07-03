@@ -1,0 +1,152 @@
+- id: HDU001
+  title: Crear y gestionar categorías de skills
+  descripcion: 'Como administrador, quiero poder crear, listar, actualizar y eliminar
+    categorías de skills (por ejemplo: Lenguajes, DevOps, Bases de Datos) para organizar
+    los skills disponibles.'
+  entidad: Categoria
+  campos:
+  - id
+  - nombre
+  acciones:
+  - POST
+  - GET
+  - PUT
+  - DELETE
+  validaciones:
+  - nombre obligatorio
+  - nombre único
+- id: HDU002
+  title: Crear y gestionar skills asociados a categorías
+  descripcion: Como administrador, quiero poder definir skills técnicos (como Java,
+    Jenkins, Docker) agrupados en categorías, para luego asignarlos a roles.
+  entidad: Skill
+  campos:
+  - id
+  - nombre
+  - categoria_id
+  acciones:
+  - POST
+  - GET
+  - PUT
+  - DELETE
+  validaciones:
+  - nombre obligatorio
+  - referencia válida a categoria
+- id: HDU003
+  title: Asociar contenido de aprendizaje a skills
+  descripcion: Como administrador, quiero poder asociar cursos y pruebas a un skill,
+    indicando el nivel objetivo (de 1 a 5), para ayudar en la nivelación de colaboradores.
+  entidad: Contenido
+  campos:
+  - nivel
+  - url_curso
+  - url_test
+  - skill_id
+  acciones:
+  - POST
+  - GET
+  - PUT
+  - DELETE
+  validaciones:
+  - nivel entre 1 y 5
+- id: HDU004
+  title: Crear y mantener roles técnicos
+  descripcion: Como administrador, quiero poder definir roles como “Desarrollador
+    Backend” o “DevOps Engineer” junto con su especialidad y grado, para asociarlos
+    luego a skills y colaboradores.
+  entidad: Rol
+  campos:
+  - nombre
+  - descripcion
+  - especialidad_id
+  - grado
+  valores_validos:
+    grado:
+    - Trainee
+    - Junior
+    - Pleno
+    - Semi-Senior
+    - Senior
+    - Experto
+  relaciones:
+  - especialidad (FK)
+- id: HDU005
+  title: Definir el nivel esperado de cada skill por rol y grado
+  descripcion: Como administrador, quiero poder definir para cada rol y grado el nivel
+    técnico mínimo requerido por skill (de 1 a 5) para facilitar la evaluación de
+    desempeño.
+  entidad: SkillMap
+  campos:
+  - rol_id
+  - grado
+  - skill_id
+  - nivel_base
+  validaciones:
+  - nivel_base entre 1 y 5
+  - combinación única (rol_id, grado, skill_id)
+- id: HDU006
+  title: Registrar y mantener colaboradores
+  descripcion: Como administrador, quiero registrar los colaboradores activos en la
+    organización para luego evaluar sus skills.
+  entidad: Colaborador
+  campos:
+  - id
+  - nombre
+  - paterno
+  - materno
+  - id_calibrador_actual
+  validaciones:
+  - id único
+  - relación opcional a otro colaborador como calibrador
+- id: HDU007
+  title: Registrar sesiones de evaluación de skills
+  descripcion: Como colaborador, quiero registrar mi autoevaluación y que luego un
+    calibrador pueda ajustarla, para tener una evaluación técnica objetiva.
+  entidad: SkillFit
+  campos:
+  - id_colaborador
+  - id_calibrador
+  - fecha_autoeval
+  - fecha_calibracion
+  - descripcion
+- id: HDU008
+  title: Registrar evaluación individual por skill
+  descripcion: Como colaborador, quiero guardar mi nivel autoevaluado por skill, y
+    permitir que un calibrador ajuste ese nivel, suba evidencia y asocie el resultado
+    de un test.
+  entidad: SkillEval
+  campos:
+  - nivel_autoeval
+  - nivel_calibrado
+  - observaciones
+  - nota_test
+  - url_evidencia
+  - id_skill_fit
+  - id_skill
+- id: HDU009
+  title: Detectar brechas de skills por colaborador
+  descripcion: Como colaborador o evaluador, quiero conocer los skills que están por
+    debajo del nivel esperado para el rol y grado del colaborador, para orientar acciones
+    de mejora.
+  fuente_datos: Comparación entre nivel_calibrado en SkillEval y nivel_base en SkillMap
+    (filtrado por rol y grado del colaborador)
+- id: HDU010
+  title: Obtener recomendaciones de cursos por skill y brecha
+  descripcion: Como colaborador, quiero recibir sugerencias de cursos alineados a
+    mis brechas de nivel, para nivelarme en los skills necesarios.
+  fuente_datos: Filtrar Contenido por skill_id y nivel igual a nivel_base (esperado)
+    en SkillMap
+- id: HDU011
+  title: Ver historial de evaluaciones
+  descripcion: Como colaborador o evaluador, quiero ver todas las sesiones de evaluación
+    pasadas de un colaborador para revisar su evolución.
+  fuente_datos: SkillFit por id_colaborador con join a SkillEval
+- id: HDU012
+  title: Marcar vigencia del colaborador
+  descripcion: Como administrador, quiero saber si un colaborador está activo en la
+    organización y desde cuándo, para excluir inactivos de evaluaciones futuras.
+  entidad: Colaborador
+  campos:
+  - vigente
+  - fecha_ingreso
+  - fecha_salida
