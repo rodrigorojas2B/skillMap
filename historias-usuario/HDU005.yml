@@ -1,0 +1,14 @@
+- id: HDU005
+  title: Definir el nivel esperado de cada skill por rol y grado
+  descripcion: Como administrador, quiero poder definir para cada rol y grado el nivel
+    técnico mínimo requerido por skill (de 1 a 5) para facilitar la evaluación de
+    desempeño.
+  entidad: SkillMap
+  campos:
+  - rol_id
+  - grado
+  - skill_id
+  - nivel_base
+  validaciones:
+  - nivel_base entre 1 y 5
+  - combinación única (rol_id, grado, skill_id)
