@@ -1,1 +1,5 @@
+src/main/java/com/skillmap/backend/model/Categoria.java
+src/main/java/com/skillmap/backend/controller/CategoriaController.java
+src/main/java/com/skillmap/backend/repository/CategoriaRepository.java
+src/main/java/com/skillmap/backend/service/CategoriaService.java
 src/main/java/com/skillmap/backend/BackendApplication.java

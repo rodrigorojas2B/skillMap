@@ -5,6 +5,80 @@
   },
   "item": [
     {
+      "name": "createSkill",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/skills",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["skills"]
+        }
+      }
+    }
+,
+    {
+      "name": "getSkillById",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/skills",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["skills"]
+        }
+      }
+    }
+,
+    {
+      "name": "getSkillById",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/skills/{id}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["skills","{id}"]
+        }
+      }
+    }
+,
+    {
+      "name": "updateSkill",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/skills/{id}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["skills","{id}"]
+        }
+      }
+    }
+,
+    {
+      "name": "deleteSkill",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/skills/{id}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["skills","{id}"]
+        }
+      }
+    }
+    {
       "name": "createCategoria",
       "request": {
         "method": "POST",
