@@ -1,0 +1,14 @@
+- id: HDU006
+  title: Registrar y mantener colaboradores
+  descripcion: Como administrador, quiero registrar los colaboradores activos en la
+    organización para luego evaluar sus skills.
+  entidad: Colaborador
+  campos:
+  - id
+  - nombre
+  - paterno
+  - materno
+  - id_calibrador_actual
+  validaciones:
+  - id único
+  - relación opcional a otro colaborador como calibrador
