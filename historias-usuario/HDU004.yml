@@ -1,0 +1,21 @@
+- id: HDU004
+  title: Crear y mantener roles técnicos
+  descripcion: Como administrador, quiero poder definir roles como “Desarrollador
+    Backend” o “DevOps Engineer” junto con su especialidad y grado, para asociarlos
+    luego a skills y colaboradores.
+  entidad: Rol
+  campos:
+  - nombre
+  - descripcion
+  - especialidad_id
+  - grado
+  valores_validos:
+    grado:
+    - Trainee
+    - Junior
+    - Pleno
+    - Semi-Senior
+    - Senior
+    - Experto
+  relaciones:
+  - especialidad (FK)
