@@ -1,0 +1,17 @@
+- id: HDU003
+  title: Asociar contenido de aprendizaje a skills
+  descripcion: Como administrador, quiero poder asociar cursos y pruebas a un skill,
+    indicando el nivel objetivo (de 1 a 5), para ayudar en la nivelación de colaboradores.
+  entidad: Contenido
+  campos:
+  - nivel
+  - url_curso
+  - url_test
+  - skill_id
+  acciones:
+  - POST
+  - GET
+  - PUT
+  - DELETE
+  validaciones:
+  - nivel entre 1 y 5
