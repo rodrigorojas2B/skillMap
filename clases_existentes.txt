@@ -1,9 +1,13 @@
+src/main/java/com/skillmap/backend/model/Contenido.java
 src/main/java/com/skillmap/backend/model/Skill.java
 src/main/java/com/skillmap/backend/model/Categoria.java
 src/main/java/com/skillmap/backend/controller/SkillController.java
 src/main/java/com/skillmap/backend/controller/CategoriaController.java
+src/main/java/com/skillmap/backend/controller/ContenidoController.java
+src/main/java/com/skillmap/backend/repository/ContenidoRepository.java
 src/main/java/com/skillmap/backend/repository/SkillRepository.java
 src/main/java/com/skillmap/backend/repository/CategoriaRepository.java
+src/main/java/com/skillmap/backend/service/ContenidoService.java
 src/main/java/com/skillmap/backend/service/SkillService.java
 src/main/java/com/skillmap/backend/service/CategoriaService.java
 src/main/java/com/skillmap/backend/BackendApplication.java

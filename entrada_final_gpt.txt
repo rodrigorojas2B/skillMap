@@ -1,48 +1,56 @@
 --- HISTORIA DE USUARIO ---
-- id: HDU003
-  title: Asociar contenido de aprendizaje a skills
-  descripcion: Como administrador, quiero poder asociar cursos y pruebas a un skill,
-    indicando el nivel objetivo (de 1 a 5), para ayudar en la nivelación de colaboradores.
-  entidad: Contenido
+- id: HDU004
+  title: Crear y mantener roles técnicos
+  descripcion: Como administrador, quiero poder definir roles como “Desarrollador
+    Backend” o “DevOps Engineer” junto con su especialidad y grado, para asociarlos
+    luego a skills y colaboradores.
+  entidad: Rol
   campos:
-  - nivel
-  - url_curso
-  - url_test
-  - skill_id
-  acciones:
-  - POST
-  - GET
-  - PUT
-  - DELETE
-  validaciones:
-  - nivel entre 1 y 5
+  - nombre
+  - descripcion
+  - especialidad_id
+  - grado
+  valores_validos:
+    grado:
+    - Trainee
+    - Junior
+    - Pleno
+    - Semi-Senior
+    - Senior
+    - Experto
+  relaciones:
+  - especialidad (FK)
 
 --- DIAGNÓSTICO Y PLAN DE CLASES ---
 --- ANÁLISIS DE CLASES EXISTENTES ---
+Genera una tabla Markdown como esta:
 
 | Clase Java | Package | Clasificación | Motivo |
 |------------|---------|----------------|--------|
-| Skill | com.skillmap.backend.model | REUTILIZABLE-AS-IS | No se requiere ninguna modificación en esta clase para la historia de usuario |
-| Categoria | com.skillmap.backend.model | REUTILIZABLE-AS-IS | No se requiere ninguna modificación en esta clase para la historia de usuario |
-| SkillController | com.skillmap.backend.controller | MODIFICABLE | Se requiere agregar nuevos métodos para manejar las operaciones de Contenido |
-| CategoriaController | com.skillmap.backend.controller | REUTILIZABLE-AS-IS | No se requiere ninguna modificación en esta clase para la historia de usuario |
-| SkillRepository | com.skillmap.backend.repository | REUTILIZABLE-AS-IS | No se requiere ninguna modificación en esta clase para la historia de usuario |
-| CategoriaRepository | com.skillmap.backend.repository | REUTILIZABLE-AS-IS | No se requiere ninguna modificación en esta clase para la historia de usuario |
-| SkillService | com.skillmap.backend.service | MODIFICABLE | Se requiere agregar nuevos métodos para manejar las operaciones de Contenido |
-| CategoriaService | com.skillmap.backend.service | REUTILIZABLE-AS-IS | No se requiere ninguna modificación en esta clase para la historia de usuario |
-| BackendApplication | com.skillmap.backend | REUTILIZABLE-AS-IS | No se requiere ninguna modificación en esta clase para la historia de usuario |
-| Contenido | com.skillmap.backend.model | NUEVA | Se requiere una nueva clase para representar el Contenido |
-| ContenidoController | com.skillmap.backend.controller | NUEVA | Se requiere una nueva clase para manejar las operaciones de Contenido |
-| ContenidoRepository | com.skillmap.backend.repository | NUEVA | Se requiere una nueva clase para manejar las operaciones de Contenido |
-| ContenidoService | com.skillmap.backend.service | NUEVA | Se requiere una nueva clase para manejar las operaciones de Contenido |
+| Contenido | com.skillmap.backend.model | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| Skill | com.skillmap.backend.model | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| Categoria | com.skillmap.backend.model | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| SkillController | com.skillmap.backend.controller | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| CategoriaController | com.skillmap.backend.controller | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| ContenidoController | com.skillmap.backend.controller | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| ContenidoRepository | com.skillmap.backend.repository | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| SkillRepository | com.skillmap.backend.repository | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| CategoriaRepository | com.skillmap.backend.repository | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| ContenidoService | com.skillmap.backend.service | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| SkillService | com.skillmap.backend.service | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| CategoriaService | com.skillmap.backend.service | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| BackendApplication | com.skillmap.backend | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario |
+| Rol | com.skillmap.backend.model | NUEVA | Se necesita para implementar la funcionalidad de la historia de usuario |
+| RolController | com.skillmap.backend.controller | NUEVA | Se necesita para implementar la funcionalidad de la historia de usuario |
+| RolRepository | com.skillmap.backend.repository | NUEVA | Se necesita para implementar la funcionalidad de la historia de usuario |
+| RolService | com.skillmap.backend.service | NUEVA | Se necesita para implementar la funcionalidad de la historia de usuario |
 
 --- INSTRUCCIONES DE MODIFICACIÓN ---
-- Crear la clase Contenido en el paquete com.skillmap.backend.model con los campos nivel, url_curso, url_test y skill_id.
-- Crear la clase ContenidoController en el paquete com.skillmap.backend.controller con los métodos POST, GET, PUT y DELETE para manejar las operaciones de Contenido.
-- Crear la clase ContenidoRepository en el paquete com.skillmap.backend.repository para manejar las operaciones de base de datos de Contenido.
-- Crear la clase ContenidoService en el paquete com.skillmap.backend.service con los métodos para manejar las operaciones de Contenido.
-- Modificar la clase SkillController en el paquete com.skillmap.backend.controller para agregar los métodos para manejar las operaciones de Contenido.
-- Modificar la clase SkillService en el paquete com.skillmap.backend.service para agregar los métodos para manejar las operaciones de Contenido.
+- No se requiere ninguna modificación en las clases existentes para esta historia de usuario.
+- Se deben crear nuevas clases para implementar la funcionalidad de la historia de usuario.
+
+--- CÓDIGO A GENERAR ---
+No se requiere generar código en este momento ya que solo se está realizando el análisis de las clases existentes y la planificación de las nuevas clases necesarias.
 
 --- INSTRUCCIONES DE GENERACIÓN DE CÓDIGO ---
 - Modifica únicamente las clases marcadas como MODIFICABLE.

@@ -1,5 +1,10 @@
+com/skillmap/backend/service/RolService.class
 com/skillmap/backend/model/Skill.class
 com/skillmap/backend/service/CategoriaService.class
+com/skillmap/backend/model/Especialidad.class
+com/skillmap/backend/repository/RolRepository.class
+com/skillmap/backend/model/Rol.class
+com/skillmap/backend/controller/RolController.class
 com/skillmap/backend/model/Categoria.class
 com/skillmap/backend/controller/SkillController.class
 com/skillmap/backend/controller/ContenidoController.class
@@ -9,5 +14,6 @@ com/skillmap/backend/BackendApplication.class
 com/skillmap/backend/repository/CategoriaRepository.class
 com/skillmap/backend/repository/SkillRepository.class
 com/skillmap/backend/service/ContenidoService.class
+com/skillmap/backend/model/Rol$Grado.class
 com/skillmap/backend/controller/CategoriaController.class
 com/skillmap/backend/repository/ContenidoRepository.class

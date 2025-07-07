@@ -3,5 +3,5 @@ projectKey=rodrigorojasg_testSpring_gpt
 serverUrl=https://sonarcloud.io
 serverVersion=8.0.0.65276
 dashboardUrl=https://sonarcloud.io/dashboard?id=rodrigorojasg_testSpring_gpt&branch=main&resolved=false
-ceTaskId=AZfmkt_17dPCfAKESePx
-ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZfmkt_17dPCfAKESePx
+ceTaskId=AZfmrT6HBR7ZEGH9v-GG
+ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZfmrT6HBR7ZEGH9v-GG
