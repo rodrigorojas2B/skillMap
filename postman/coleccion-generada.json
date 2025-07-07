@@ -5,76 +5,61 @@
   },
   "item": [
     {
-      "name": "createSkill",
+      "name": "createContenido",
       "request": {
         "method": "POST",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/skills",
+          "raw": "http://localhost:8080/api/skill/{id}/contenido",
           "protocol": "http",
           "host": ["localhost"],
           "port": "8080",
-          "path": ["skills"]
+          "path": ["api","skill","{id}","contenido"]
         }
       }
     }
 ,
     {
-      "name": "getSkillById",
+      "name": "getContenido",
       "request": {
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/skills",
+          "raw": "http://localhost:8080/api/skill/{id}/contenido/{contenidoId}",
           "protocol": "http",
           "host": ["localhost"],
           "port": "8080",
-          "path": ["skills"]
+          "path": ["api","skill","{id}","contenido","{contenidoId}"]
         }
       }
     }
 ,
     {
-      "name": "getSkillById",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/skills/{id}",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["skills","{id}"]
-        }
-      }
-    }
-,
-    {
-      "name": "updateSkill",
+      "name": "updateContenido",
       "request": {
         "method": "PUT",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/skills/{id}",
+          "raw": "http://localhost:8080/api/skill/{id}/contenido",
           "protocol": "http",
           "host": ["localhost"],
           "port": "8080",
-          "path": ["skills","{id}"]
+          "path": ["api","skill","{id}","contenido"]
         }
       }
     }
 ,
     {
-      "name": "deleteSkill",
+      "name": "deleteContenido",
       "request": {
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/skills/{id}",
+          "raw": "http://localhost:8080/api/skill/{id}/contenido/{contenidoId}",
           "protocol": "http",
           "host": ["localhost"],
           "port": "8080",
-          "path": ["skills","{id}"]
+          "path": ["api","skill","{id}","contenido","{contenidoId}"]
         }
       }
     }
@@ -134,6 +119,65 @@
           "host": ["localhost"],
           "port": "8080",
           "path": ["categorias","{id}"]
+        }
+      }
+    }
+    {
+      "name": "create",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/contenido",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api","contenido"]
+        }
+      }
+    }
+,
+    {
+      "name": "get",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/contenido/{id}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api","contenido","{id}"]
+        }
+      }
+    }
+,
+    {
+      "name": "update",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/contenido",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api","contenido"]
+        }
+      }
+    }
+,
+    {
+      "name": "delete",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/contenido/{id}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api","contenido","{id}"]
         }
       }
     }

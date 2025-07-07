@@ -3,104 +3,98 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 @Entity
-public class Skill {
+public class Contenido {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
-    private String nombre;
-    @ManyToOne
+    @Min(1)
+    @Max(5)
+    private Integer nivel;
     @NotNull
-    private Categoria categoria;
+    @Column(length = 500)
+    private String url_curso;
+    @NotNull
+    @Column(length = 500)
+    private String url_test;
+    @NotNull
+    private Long skill_id;
+    // getters and setters
     public Long getId() {
         return id;
     }
     public void setId(Long id) {
         this.id = id;
     }
-    public String getNombre() {
-        return nombre;
+    public Integer getNivel() {
+        return nivel;
     }
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setNivel(Integer nivel) {
+        this.nivel = nivel;
     }
-    public Categoria getCategoria() {
-        return categoria;
+    public String getUrl_curso() {
+        return url_curso;
     }
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
+    public void setUrl_curso(String url_curso) {
+        this.url_curso = url_curso;
     }
-}
-package com.skillmap.backend.repository;
-import com.skillmap.backend.model.Skill;
-import org.springframework.data.repository.CrudRepository;
-public interface SkillRepository extends CrudRepository<Skill, Long> {
-}
-package com.skillmap.backend.service;
-import com.skillmap.backend.model.Skill;
-import com.skillmap.backend.repository.SkillRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-@Service
-public class SkillService {
-    private final SkillRepository skillRepository;
-    @Autowired
-    public SkillService(SkillRepository skillRepository) {
-        this.skillRepository = skillRepository;
+    public String getUrl_test() {
+        return url_test;
     }
-    public Skill save(Skill skill) {
-        return skillRepository.save(skill);
+    public void setUrl_test(String url_test) {
+        this.url_test = url_test;
     }
-    public Iterable<Skill> getAll() {
-        return skillRepository.findAll();
+    public Long getSkill_id() {
+        return skill_id;
     }
-    public Skill getById(Long id) {
-        return skillRepository.findById(id).orElse(null);
-    }
-    public void delete(Long id) {
-        skillRepository.deleteById(id);
+    public void setSkill_id(Long skill_id) {
+        this.skill_id = skill_id;
     }
 }
 package com.skillmap.backend.controller;
-import com.skillmap.backend.model.Skill;
+import com.skillmap.backend.model.Contenido;
+import com.skillmap.backend.service.ContenidoService;
 import com.skillmap.backend.service.SkillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 @RestController
-@RequestMapping("/skills")
+@RequestMapping("/api/skill")
 public class SkillController {
-    private final SkillService skillService;
     @Autowired
-    public SkillController(SkillService skillService) {
-        this.skillService = skillService;
+    private SkillService skillService;
+    @Autowired
+    private ContenidoService contenidoService;
+    // existing methods
+    @PostMapping("/{id}/contenido")
+    public Contenido createContenido(@PathVariable Long id, @RequestBody Contenido contenido) {
+        contenido.setSkill_id(id);
+        return contenidoService.save(contenido);
     }
-    @PostMapping
-    public Skill createSkill(@RequestBody Skill skill) {
-        return skillService.save(skill);
-    }
-    @GetMapping
-    public Iterable<Skill> getAllSkills() {
-        return skillService.getAll();
-    }
-    @GetMapping("/{id}")
-    public Skill getSkillById(@PathVariable Long id) {
-        return skillService.getById(id);
-    }
-    @PutMapping("/{id}")
-    public Skill updateSkill(@PathVariable Long id, @RequestBody Skill skill) {
-        Skill existingSkill = skillService.getById(id);
-        if (existingSkill != null) {
-            existingSkill.setNombre(skill.getNombre());
-            existingSkill.setCategoria(skill.getCategoria());
-            return skillService.save(existingSkill);
+    @GetMapping("/{id}/contenido/{contenidoId}")
+    public Contenido getContenido(@PathVariable Long id, @PathVariable Long contenidoId) {
+        Contenido contenido = contenidoService.get(contenidoId);
+        if (contenido != null && contenido.getSkill_id().equals(id)) {
+            return contenido;
         }
         return null;
     }
-    @DeleteMapping("/{id}")
-    public void deleteSkill(@PathVariable Long id) {
-        skillService.delete(id);
+    @PutMapping("/{id}/contenido")
+    public Contenido updateContenido(@PathVariable Long id, @RequestBody Contenido contenido) {
+        if (contenido.getSkill_id().equals(id)) {
+            return contenidoService.update(contenido);
+        }
+        return null;
+    }
+    @DeleteMapping("/{id}/contenido/{contenidoId}")
+    public void deleteContenido(@PathVariable Long id, @PathVariable Long contenidoId) {
+        Contenido contenido = contenidoService.get(contenidoId);
+        if (contenido != null && contenido.getSkill_id().equals(id)) {
+            contenidoService.delete(contenidoId);
+        }
     }
 }

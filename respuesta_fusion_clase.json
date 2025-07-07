@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-Bqmh4OP9WUJkVLs41wFZdnCAH7zTv",
+  "object": "chat.completion",
+  "created": 1751919934,
+  "model": "gpt-4-0613",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "```java\npackage com.skillmap.backend.service;\n\nimport com.skillmap.backend.model.Skill;\nimport com.skillmap.backend.model.Contenido;\nimport com.skillmap.backend.repository.SkillRepository;\nimport com.skillmap.backend.repository.ContenidoRepository;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\n\n@Service\npublic class SkillService {\n    private final SkillRepository skillRepository;\n    private final ContenidoRepository contenidoRepository;\n\n    @Autowired\n    public SkillService(SkillRepository skillRepository, ContenidoRepository contenidoRepository) {\n        this.skillRepository = skillRepository;\n        this.contenidoRepository = contenidoRepository;\n    }\n\n    public Skill save(Skill skill) {\n        return skillRepository.save(skill);\n    }\n\n    public Iterable<Skill> getAll() {\n        return skillRepository.findAll();\n    }\n\n    public Skill getById(Long id) {\n        return skillRepository.findById(id).orElse(null);\n    }\n\n    public void delete(Long id) {\n        skillRepository.deleteById(id);\n    }\n\n    public Contenido saveContenido(Contenido contenido) {\n        return contenidoRepository.save(contenido);\n    }\n\n    public Contenido getContenido(Long id) {\n        return contenidoRepository.findById(id).orElse(null);\n    }\n\n    public Contenido updateContenido(Contenido contenido) {\n        return contenidoRepository.save(contenido);\n    }\n\n    public void deleteContenido(Long id) {\n        contenidoRepository.deleteById(id);\n    }\n}\n```\n",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 481,
+    "completion_tokens": 287,
+    "total_tokens": 768,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": null
+}

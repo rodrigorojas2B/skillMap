@@ -1,26 +1,22 @@
 package com.skillmap.backend.service;
 import com.skillmap.backend.model.Contenido;
 import com.skillmap.backend.repository.ContenidoRepository;
-import com.skillmap.backend.repository.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 @Service
-public class SkillService {
-    @Autowired
-    private SkillRepository skillRepository;
+public class ContenidoService {
     @Autowired
     private ContenidoRepository contenidoRepository;
-    // existing methods
-    public Contenido saveContenido(Contenido contenido) {
+    public Contenido save(Contenido contenido) {
         return contenidoRepository.save(contenido);
     }
-    public Contenido getContenido(Long id) {
+    public Contenido get(Long id) {
         return contenidoRepository.findById(id).orElse(null);
     }
-    public Contenido updateContenido(Contenido contenido) {
+    public Contenido update(Contenido contenido) {
         return contenidoRepository.save(contenido);
     }
-    public void deleteContenido(Long id) {
+    public void delete(Long id) {
         contenidoRepository.deleteById(id);
     }
 }

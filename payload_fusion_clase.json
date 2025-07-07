@@ -1,0 +1,14 @@
+{
+  "model": "gpt-4",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Eres un generador de código Java. Fusiona y devuelve solo una clase final completa y corregida."
+    },
+    {
+      "role": "user",
+      "content": "--- CLASE ORIGINAL EXISTENTE ---\npackage com.skillmap.backend.service;\nimport com.skillmap.backend.model.Skill;\nimport com.skillmap.backend.repository.SkillRepository;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\n@Service\npublic class SkillService {\n    private final SkillRepository skillRepository;\n    @Autowired\n    public SkillService(SkillRepository skillRepository) {\n        this.skillRepository = skillRepository;\n    }\n    public Skill save(Skill skill) {\n        return skillRepository.save(skill);\n    }\n    public Iterable<Skill> getAll() {\n        return skillRepository.findAll();\n    }\n    public Skill getById(Long id) {\n        return skillRepository.findById(id).orElse(null);\n    }\n    public void delete(Long id) {\n        skillRepository.deleteById(id);\n    }\n}\n\n--- CLASE GENERADA POR IA ---\npackage com.skillmap.backend.service;\nimport com.skillmap.backend.model.Contenido;\nimport com.skillmap.backend.repository.ContenidoRepository;\nimport com.skillmap.backend.repository.SkillRepository;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\n@Service\npublic class SkillService {\n    @Autowired\n    private SkillRepository skillRepository;\n    @Autowired\n    private ContenidoRepository contenidoRepository;\n    // existing methods\n    public Contenido saveContenido(Contenido contenido) {\n        return contenidoRepository.save(contenido);\n    }\n    public Contenido getContenido(Long id) {\n        return contenidoRepository.findById(id).orElse(null);\n    }\n    public Contenido updateContenido(Contenido contenido) {\n        return contenidoRepository.save(contenido);\n    }\n    public void deleteContenido(Long id) {\n        contenidoRepository.deleteById(id);\n    }\n}\n\n--- INSTRUCCIONES ---\nFusiona ambas clases asegurando lo siguiente:\\n- Mantén todos los métodos válidos de la clase original.\\n- Agrega los métodos nuevos de la clase generada.\\n- Reemplaza métodos si tienen la misma firma pero diferente cuerpo.\\n- No elimines métodos válidos del original que no estén en la nueva.\\n- Devuelve solo una clase Java válida (sin explicaciones, sin texto extra, sin backticks)."
+    }
+  ],
+  "temperature": 0.3
+}

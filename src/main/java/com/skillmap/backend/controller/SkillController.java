@@ -1,40 +1,42 @@
 package com.skillmap.backend.controller;
-import com.skillmap.backend.model.Skill;
+import com.skillmap.backend.model.Contenido;
+import com.skillmap.backend.service.ContenidoService;
 import com.skillmap.backend.service.SkillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 @RestController
-@RequestMapping("/skills")
+@RequestMapping("/api/skill")
 public class SkillController {
-    private final SkillService skillService;
     @Autowired
-    public SkillController(SkillService skillService) {
-        this.skillService = skillService;
+    private SkillService skillService;
+    @Autowired
+    private ContenidoService contenidoService;
+    // existing methods
+    @PostMapping("/{id}/contenido")
+    public Contenido createContenido(@PathVariable Long id, @RequestBody Contenido contenido) {
+        contenido.setSkill_id(id);
+        return contenidoService.save(contenido);
     }
-    @PostMapping
-    public Skill createSkill(@RequestBody Skill skill) {
-        return skillService.save(skill);
-    }
-    @GetMapping
-    public Iterable<Skill> getAllSkills() {
-        return skillService.getAll();
-    }
-    @GetMapping("/{id}")
-    public Skill getSkillById(@PathVariable Long id) {
-        return skillService.getById(id);
-    }
-    @PutMapping("/{id}")
-    public Skill updateSkill(@PathVariable Long id, @RequestBody Skill skill) {
-        Skill existingSkill = skillService.getById(id);
-        if (existingSkill != null) {
-            existingSkill.setNombre(skill.getNombre());
-            existingSkill.setCategoria(skill.getCategoria());
-            return skillService.save(existingSkill);
+    @GetMapping("/{id}/contenido/{contenidoId}")
+    public Contenido getContenido(@PathVariable Long id, @PathVariable Long contenidoId) {
+        Contenido contenido = contenidoService.get(contenidoId);
+        if (contenido != null && contenido.getSkill_id().equals(id)) {
+            return contenido;
         }
         return null;
     }
-    @DeleteMapping("/{id}")
-    public void deleteSkill(@PathVariable Long id) {
-        skillService.delete(id);
+    @PutMapping("/{id}/contenido")
+    public Contenido updateContenido(@PathVariable Long id, @RequestBody Contenido contenido) {
+        if (contenido.getSkill_id().equals(id)) {
+            return contenidoService.update(contenido);
+        }
+        return null;
+    }
+    @DeleteMapping("/{id}/contenido/{contenidoId}")
+    public void deleteContenido(@PathVariable Long id, @PathVariable Long contenidoId) {
+        Contenido contenido = contenidoService.get(contenidoId);
+        if (contenido != null && contenido.getSkill_id().equals(id)) {
+            contenidoService.delete(contenidoId);
+        }
     }
 }

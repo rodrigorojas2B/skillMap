@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-BqmhTvYrc7XEKnoHZfZoqkR5Y0TqG",
+  "object": "chat.completion",
+  "created": 1751919959,
+  "model": "gpt-4-0613",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "El error de compilación se debe a que se están intentando usar métodos que no existen en la clase Contenido. Los métodos son setSkill_id(), getSkill_id() que se utilizan en la clase SkillController.\n\nPlan de corrección:\n\n1. Archivo: src/main/java/com/skillmap/backend/model/Contenido.java\n   Línea: No aplica\n   Explicación: La clase Contenido no tiene los métodos setSkill_id() y getSkill_id(). Estos métodos se están intentando usar en la clase SkillController.\n   Clases relacionadas: Contenido, SkillController\n   Corrección: Agregar los métodos setSkill_id() y getSkill_id() en la clase Contenido. El método setSkill_id() debe aceptar un parámetro de tipo Long y asignarlo a la variable de instancia skill_id. El método getSkill_id() debe devolver el valor de la variable de instancia skill_id.\n\n2. Archivo: src/main/java/com/skillmap/backend/controller/SkillController.java\n   Líneas: 17, 23, 30, 38\n   Explicación: Se están intentando usar los métodos setSkill_id() y getSkill_id() en un objeto de la clase Contenido. Estos métodos no existen en la clase Contenido.\n   Clases relacionadas: SkillController, Contenido\n   Corrección: Asegurarse de que los métodos setSkill_id() y getSkill_id() existan en la clase Contenido antes de usarlos en la clase SkillController. Si estos métodos no son necesarios, eliminar las líneas de código que los utilizan.\n\n3. Archivo: src/main/java/com/skillmap/backend/service/ContenidoService.java\n   Línea: No aplica\n   Explicación: Si se agregan los métodos setSkill_id() y getSkill_id() en la clase Contenido, puede ser necesario actualizar la clase ContenidoService para manejar estos nuevos métodos.\n   Clases relacionadas: ContenidoService, Contenido\n   Corrección: Revisar la clase ContenidoService y actualizarla si es necesario para manejar los nuevos métodos en la clase Contenido.\n\n4. Archivo: src/main/java/com/skillmap/backend/repository/ContenidoRepository.java\n   Línea: No aplica\n   Explicación: Si se agregan los métodos setSkill_id() y getSkill_id() en la clase Contenido, puede ser necesario actualizar la clase ContenidoRepository para manejar estos nuevos métodos.\n   Clases relacionadas: ContenidoRepository, Contenido\n   Corrección: Revisar la clase ContenidoRepository y actualizarla si es necesario para manejar los nuevos métodos en la clase Contenido.",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 3703,
+    "completion_tokens": 590,
+    "total_tokens": 4293,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": null
+}

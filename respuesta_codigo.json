@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-BqmhssoZNTnqBqa2PyZISKIFNoepA",
+  "object": "chat.completion",
+  "created": 1751919984,
+  "model": "gpt-4-0613",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "--- ARCHIVO: src/main/java/com/skillmap/backend/model/Contenido.java ---\n```java\npackage com.skillmap.backend.model;\nimport jakarta.persistence.Entity;\nimport jakarta.persistence.GeneratedValue;\nimport jakarta.persistence.GenerationType;\nimport jakarta.persistence.Id;\nimport jakarta.persistence.Column;\nimport jakarta.validation.constraints.Max;\nimport jakarta.validation.constraints.Min;\nimport jakarta.validation.constraints.NotNull;\n\n@Entity\npublic class Contenido {\n    @Id\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\n    private Long id;\n    @NotNull\n    @Min(1)\n    @Max(5)\n    private Integer nivel;\n    @NotNull\n    @Column(length = 500)\n    private String url_curso;\n    @NotNull\n    @Column(length = 500)\n    private String url_test;\n    @NotNull\n    private Long skill_id;\n\n    // getters and setters\n    public Long getId() {\n        return id;\n    }\n    public void setId(Long id) {\n        this.id = id;\n    }\n    public Integer getNivel() {\n        return nivel;\n    }\n    public void setNivel(Integer nivel) {\n        this.nivel = nivel;\n    }\n    public String getUrl_curso() {\n        return url_curso;\n    }\n    public void setUrl_curso(String url_curso) {\n        this.url_curso = url_curso;\n    }\n    public String getUrl_test() {\n        return url_test;\n    }\n    public void setUrl_test(String url_test) {\n        this.url_test = url_test;\n    }\n    public Long getSkill_id() {\n        return skill_id;\n    }\n    public void setSkill_id(Long skill_id) {\n        this.skill_id = skill_id;\n    }\n}\n```\n\n--- ARCHIVO: src/main/java/com/skillmap/backend/controller/SkillController.java ---\n```java\npackage com.skillmap.backend.controller;\nimport com.skillmap.backend.model.Contenido;\nimport com.skillmap.backend.service.ContenidoService;\nimport com.skillmap.backend.service.SkillService;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.web.bind.annotation.*;\n\n@RestController\n@RequestMapping(\"/api/skill\")\npublic class SkillController {\n    @Autowired\n    private SkillService skillService;\n    @Autowired\n    private ContenidoService contenidoService;\n\n    // existing methods\n    @PostMapping(\"/{id}/contenido\")\n    public Contenido createContenido(@PathVariable Long id, @RequestBody Contenido contenido) {\n        contenido.setSkill_id(id);\n        return contenidoService.save(contenido);\n    }\n    @GetMapping(\"/{id}/contenido/{contenidoId}\")\n    public Contenido getContenido(@PathVariable Long id, @PathVariable Long contenidoId) {\n        Contenido contenido = contenidoService.get(contenidoId);\n        if (contenido != null && contenido.getSkill_id().equals(id)) {\n            return contenido;\n        }\n        return null;\n    }\n    @PutMapping(\"/{id}/contenido\")\n    public Contenido updateContenido(@PathVariable Long id, @RequestBody Contenido contenido) {\n        if (contenido.getSkill_id().equals(id)) {\n            return contenidoService.update(contenido);\n        }\n        return null;\n    }\n    @DeleteMapping(\"/{id}/contenido/{contenidoId}\")\n    public void deleteContenido(@PathVariable Long id, @PathVariable Long contenidoId) {\n        Contenido contenido = contenidoService.get(contenidoId);\n        if (contenido != null && contenido.getSkill_id().equals(id)) {\n            contenidoService.delete(contenidoId);\n        }\n    }\n}\n```",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 2887,
+    "completion_tokens": 708,
+    "total_tokens": 3595,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": null
+}
