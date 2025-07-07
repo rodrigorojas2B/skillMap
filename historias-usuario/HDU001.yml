@@ -1,0 +1,17 @@
+- id: HDU001
+  title: Crear y gestionar categorías de skills
+  descripcion: 'Como administrador, quiero poder crear, listar, actualizar y eliminar
+    categorías de skills (por ejemplo: Lenguajes, DevOps, Bases de Datos) para organizar
+    los skills disponibles.'
+  entidad: Categoria
+  campos:
+  - id
+  - nombre
+  acciones:
+  - POST
+  - GET
+  - PUT
+  - DELETE
+  validaciones:
+  - nombre obligatorio
+  - nombre único
