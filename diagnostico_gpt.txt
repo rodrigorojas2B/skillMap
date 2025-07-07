@@ -1,0 +1,24 @@
+--- ANÁLISIS DE CLASES EXISTENTES ---
+
+| Clase Java | Package | Clasificación | Motivo |
+|------------|---------|----------------|--------|
+| BackendApplication | com.skillmap.backend | REUTILIZABLE-AS-IS | Clase principal de la aplicación Spring Boot |
+
+--- INSTRUCCIONES DE MODIFICACIÓN ---
+
+De acuerdo con la historia de usuario proporcionada, necesitamos crear una entidad `Categoria` con los campos `id` y `nombre`. También necesitamos implementar las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para esta entidad. Como no se proporcionan clases existentes que puedan ser reutilizadas o modificadas para este propósito, todas las clases necesarias para implementar esta funcionalidad son nuevas.
+
+Las clases que necesitamos crear son:
+
+- `Categoria`: Esta es la entidad que representa una categoría de habilidades. Debe tener los campos `id` y `nombre`.
+- `CategoriaRepository`: Esta es la interfaz que proporciona las operaciones CRUD para la entidad `Categoria`.
+- `CategoriaService`: Esta es la clase que implementa la lógica de negocio para la entidad `Categoria`.
+- `CategoriaController`: Esta es la clase que maneja las solicitudes HTTP para la entidad `Categoria`.
+
+Además, necesitamos implementar las validaciones para la entidad `Categoria`. En particular, necesitamos asegurarnos de que el campo `nombre` es obligatorio y único. Estas validaciones pueden ser implementadas en la clase `CategoriaService`.
+
+Finalmente, necesitamos implementar pruebas unitarias para asegurarnos de que nuestra implementación es correcta. Estas pruebas pueden ser implementadas en una clase `CategoriaServiceTest`.
+
+--- CÓDIGO A GENERAR ---
+
+El código a generar incluirá las clases `Categoria`, `CategoriaRepository`, `CategoriaService`, `CategoriaController` y `CategoriaServiceTest`. Cada una de estas clases debe estar en su paquete correcto, según lo indicado en la tabla de análisis de clases existentes.

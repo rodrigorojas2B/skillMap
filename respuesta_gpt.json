@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-BqksBxETYI7CgnDLCJUw2lQx1T6Sl",
+  "object": "chat.completion",
+  "created": 1751912935,
+  "model": "gpt-4-0613",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "```java\npackage com.skillmap.backend.model;\n\nimport jakarta.persistence.Entity;\nimport jakarta.persistence.GeneratedValue;\nimport jakarta.persistence.GenerationType;\nimport jakarta.persistence.Id;\nimport jakarta.validation.constraints.NotBlank;\n\n@Entity\npublic class Categoria {\n\n    @Id\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\n    private Long id;\n\n    @NotBlank\n    private String nombre;\n\n    public Long getId() {\n        return id;\n    }\n\n    public void setId(Long id) {\n        this.id = id;\n    }\n\n    public String getNombre() {\n        return nombre;\n    }\n\n    public void setNombre(String nombre) {\n        this.nombre = nombre;\n    }\n}\n```\n\n```java\npackage com.skillmap.backend.repository;\n\nimport com.skillmap.backend.model.Categoria;\nimport org.springframework.data.jpa.repository.JpaRepository;\nimport org.springframework.stereotype.Repository;\n\n@Repository\npublic interface CategoriaRepository extends JpaRepository<Categoria, Long> {\n    boolean existsByNombre(String nombre);\n}\n```\n\n```java\npackage com.skillmap.backend.service;\n\nimport com.skillmap.backend.model.Categoria;\nimport com.skillmap.backend.repository.CategoriaRepository;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\n\n@Service\npublic class CategoriaService {\n\n    @Autowired\n    private CategoriaRepository categoriaRepository;\n\n    public Categoria createCategoria(Categoria categoria) {\n        if (categoriaRepository.existsByNombre(categoria.getNombre())) {\n            throw new IllegalArgumentException(\"El nombre de la categoría ya existe\");\n        }\n        return categoriaRepository.save(categoria);\n    }\n\n    public Iterable<Categoria> getAllCategorias() {\n        return categoriaRepository.findAll();\n    }\n\n    public Categoria updateCategoria(Long id, Categoria categoria) {\n        if (!categoriaRepository.existsById(id)) {\n            throw new IllegalArgumentException(\"La categoría no existe\");\n        }\n        if (categoriaRepository.existsByNombre(categoria.getNombre())) {\n            throw new IllegalArgumentException(\"El nombre de la categoría ya existe\");\n        }\n        categoria.setId(id);\n        return categoriaRepository.save(categoria);\n    }\n\n    public void deleteCategoria(Long id) {\n        if (!categoriaRepository.existsById(id)) {\n            throw new IllegalArgumentException(\"La categoría no existe\");\n        }\n        categoriaRepository.deleteById(id);\n    }\n}\n```\n\n```java\npackage com.skillmap.backend.controller;\n\nimport com.skillmap.backend.model.Categoria;\nimport com.skillmap.backend.service.CategoriaService;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.web.bind.annotation.*;\n\n@RestController\n@RequestMapping(\"/categorias\")\npublic class CategoriaController {\n\n    @Autowired\n    private CategoriaService categoriaService;\n\n    @PostMapping\n    public Categoria createCategoria(@RequestBody Categoria categoria) {\n        return categoriaService.createCategoria(categoria);\n    }\n\n    @GetMapping\n    public Iterable<Categoria> getAllCategorias() {\n        return categoriaService.getAllCategorias();\n    }\n\n    @PutMapping(\"/{id}\")\n    public Categoria updateCategoria(@PathVariable Long id, @RequestBody Categoria categoria) {\n        return categoriaService.updateCategoria(id, categoria);\n    }\n\n    @DeleteMapping(\"/{id}\")\n    public void deleteCategoria(@PathVariable Long id) {\n        categoriaService.deleteCategoria(id);\n    }\n}\n```\n\n```java\npackage com.skillmap.backend.service;\n\nimport com.skillmap.backend.model.Categoria;\nimport com.skillmap.backend.repository.CategoriaRepository;\nimport org.junit.jupiter.api.BeforeEach;\nimport org.junit.jupiter.api.Test;\nimport org.mockito.InjectMocks;\nimport org.mockito.Mock;\nimport org.mockito.MockitoAnnotations;\n\nimport static org.junit.jupiter.api.Assertions.assertThrows;\nimport static org.mockito.Mockito.*;\n\nclass CategoriaServiceTest {\n\n    @InjectMocks\n    private CategoriaService categoriaService;\n\n    @Mock\n    private CategoriaRepository categoriaRepository;\n\n    @BeforeEach\n    void setUp() {\n        MockitoAnnotations.openMocks(this);\n    }\n\n    @Test\n    void createCategoria_nombreDuplicado_lanzaExcepcion() {\n        Categoria categoria = new Categoria();\n        categoria.setNombre(\"Test\");\n        when(categoriaRepository.existsByNombre(categoria.getNombre())).thenReturn(true);\n\n        assertThrows(IllegalArgumentException.class, () -> categoriaService.createCategoria(categoria));\n        verify(categoriaRepository, never()).save(any(Categoria.class));\n    }\n\n    @Test\n    void updateCategoria_noExiste_lanzaExcepcion() {\n        Categoria categoria = new Categoria();\n        categoria.setNombre(\"Test\");\n        when(categoriaRepository.existsById(anyLong())).thenReturn(false);\n\n        assertThrows(IllegalArgumentException.class, () -> categoriaService.updateCategoria(1L, categoria));\n        verify(categoriaRepository, never()).save(any(Categoria.class));\n    }\n\n    @Test\n    void deleteCategoria_noExiste_lanzaExcepcion() {\n        when(categoriaRepository.existsById(anyLong())).thenReturn(false);\n\n        assertThrows(IllegalArgumentException.class, () -> categoriaService.deleteCategoria(1L));\n        verify(categoriaRepository, never()).deleteById(anyLong());\n    }\n}\n```",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1173,
+    "completion_tokens": 977,
+    "total_tokens": 2150,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": null
+}

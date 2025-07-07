@@ -1,0 +1,71 @@
+
+
+--- HISTORIA DE USUARIO ---
+- id: HDU001
+  title: Crear y gestionar categorías de skills
+  descripcion: 'Como administrador, quiero poder crear, listar, actualizar y eliminar
+    categorías de skills (por ejemplo: Lenguajes, DevOps, Bases de Datos) para organizar
+    los skills disponibles.'
+  entidad: Categoria
+  campos:
+  - id
+  - nombre
+  acciones:
+  - POST
+  - GET
+  - PUT
+  - DELETE
+  validaciones:
+  - nombre obligatorio
+  - nombre único
+
+
+--- CLASES DISPONIBLES EN EL PROYECTO ---
+BackendApplication
+
+
+--- CÓDIGO EXISTENTE DEL PROYECTO ---
+
+
+// Archivo: src/main/java/com/skillmap/backend/BackendApplication.java
+
+package com.skillmap.backend;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class BackendApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(BackendApplication.class, args);
+	}
+
+}
+
+--- ANÁLISIS DE CLASES EXISTENTES ---
+Genera una tabla Markdown como esta:
+
+| Clase Java | Package | Clasificación | Motivo |
+|------------|---------|----------------|--------|
+| Employee | com.example.EmployeeCoreApi.model | REUTILIZABLE-AS-IS | Contiene atributo `gender` |
+| EmployeeServiceImpl | com.example.EmployeeCoreApi.service.impl | MODIFICABLE | Debe validar antes de borrar |
+| CannotDeleteEmployeeException | com.example.EmployeeCoreApi.exception | NUEVA | Requerida para lanzar excepción |
+| EmployeeServiceImplTest | com.example.EmployeeCoreApi.service.impl | NUEVA | Pruebas unitarias de validación |
+
+--- INSTRUCCIONES DE MODIFICACIÓN ---
+- No eliminar ni reemplazar lógica existente.
+- Si se modifica un método, incluirlo completo con el nuevo código y lo que ya tenía.
+- Solo generar clases nuevas si están indicadas como NUEVA.
+- Cada clase debe estar en su package correcto, según lo indicado en la tabla.
+- NO repetir clases ya existentes si no cambian.
+- NO eliminar los métodos existentes a menos que sea necesario
+- NO reemplazar métodos u otro contenido de las clases existentes por comentarios entre líneas
+- Solo considerar como existente una clase si está listada explícitamente en "CLASES DISPONIBLES EN EL PROYECTO".
+- No debes asumir la existencia de clases que no aparecen explícitamente en la sección anterior. Si alguna clase no está listada entre las clases disponibles ni aparece en el código entregado, debe considerarse INEXISTENTE y marcada como NUEVA en el análisis.
+- Si una clase no aparece listada, asumir que es NUEVA.
+- Si una clase herada de otra clase o importa una interfaz propia del proyecto asegúrate que esta esté entre las clases existentes o genera el código respectivo de no existir previamente
+
+--- CÓDIGO A GENERAR ---
+Devuelve solo clases Java válidas. Cada bloque debe comenzar con `package ...`.
+Incluye los tests JUnit5 en el mismo formato si aplica.

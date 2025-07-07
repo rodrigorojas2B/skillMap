@@ -1,0 +1,5 @@
+com/skillmap/backend/model/Categoria.class
+com/skillmap/backend/service/CategoriaService.class
+com/skillmap/backend/controller/CategoriaController.class
+com/skillmap/backend/BackendApplication.class
+com/skillmap/backend/repository/CategoriaRepository.class
