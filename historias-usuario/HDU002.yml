@@ -1,0 +1,17 @@
+- id: HDU002
+  title: Crear y gestionar skills asociados a categorías
+  descripcion: Como administrador, quiero poder definir skills técnicos (como Java,
+    Jenkins, Docker) agrupados en categorías, para luego asignarlos a roles.
+  entidad: Skill
+  campos:
+  - id
+  - nombre
+  - categoria_id
+  acciones:
+  - POST
+  - GET
+  - PUT
+  - DELETE
+  validaciones:
+  - nombre obligatorio
+  - referencia válida a categoria
