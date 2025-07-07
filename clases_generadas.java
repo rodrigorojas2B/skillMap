@@ -3,75 +3,115 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.OneToOne;
 @Entity
-@Table(name = "skill_map")
-public class SkillMap {
+public class Colaborador {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @NotNull
-    @Column(name = "rol_id")
-    private Long rolId;
-    @NotNull
-    @Column(name = "grado")
-    private String grado;
-    @NotNull
-    @Column(name = "skill_id")
-    private Long skillId;
-    @NotNull
-    @Min(1)
-    @Max(5)
-    @Column(name = "nivel_base")
-    private Integer nivelBase;
-    // getters and setters
+    private String nombre;
+    private String paterno;
+    private String materno;
+    
+    @OneToOne
+    private Colaborador calibrador;
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public String getNombre() {
+        return nombre;
+    }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+    public String getPaterno() {
+        return paterno;
+    }
+    public void setPaterno(String paterno) {
+        this.paterno = paterno;
+    }
+    public String getMaterno() {
+        return materno;
+    }
+    public void setMaterno(String materno) {
+        this.materno = materno;
+    }
+    public Colaborador getCalibrador() {
+        return calibrador;
+    }
+    public void setCalibrador(Colaborador calibrador) {
+        this.calibrador = calibrador;
+    }
 }
 package com.skillmap.backend.repository;
-import com.skillmap.backend.model.SkillMap;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-@Repository
-public interface SkillMapRepository extends JpaRepository<SkillMap, Long> {
+import org.springframework.data.repository.CrudRepository;
+import com.skillmap.backend.model.Colaborador;
+public interface ColaboradorRepository extends CrudRepository<Colaborador, Long> {
 }
 package com.skillmap.backend.service;
-import com.skillmap.backend.model.SkillMap;
-import com.skillmap.backend.repository.SkillMapRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.skillmap.backend.model.Colaborador;
+import com.skillmap.backend.repository.ColaboradorRepository;
 @Service
-public class SkillMapService {
-    private final SkillMapRepository skillMapRepository;
+public class ColaboradorService {
+    private final ColaboradorRepository colaboradorRepository;
     @Autowired
-    public SkillMapService(SkillMapRepository skillMapRepository) {
-        this.skillMapRepository = skillMapRepository;
+    public ColaboradorService(ColaboradorRepository colaboradorRepository) {
+        this.colaboradorRepository = colaboradorRepository;
     }
-    public SkillMap saveSkillMap(SkillMap skillMap) {
-        return skillMapRepository.save(skillMap);
+    public Colaborador save(Colaborador colaborador) {
+        return colaboradorRepository.save(colaborador);
+    }
+    public Iterable<Colaborador> getAll() {
+        return colaboradorRepository.findAll();
+    }
+    public Colaborador getById(Long id) {
+        return colaboradorRepository.findById(id).orElse(null);
+    }
+    public void delete(Long id) {
+        colaboradorRepository.deleteById(id);
     }
 }
 package com.skillmap.backend.controller;
-import com.skillmap.backend.model.SkillMap;
-import com.skillmap.backend.service.SkillMapService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.skillmap.backend.model.Colaborador;
+import com.skillmap.backend.service.ColaboradorService;
 @RestController
-@RequestMapping("/api/skillmap")
-public class SkillMapController {
-    private final SkillMapService skillMapService;
+@RequestMapping("/api/colaboradores")
+public class ColaboradorController {
+    private final ColaboradorService colaboradorService;
     @Autowired
-    public SkillMapController(SkillMapService skillMapService) {
-        this.skillMapService = skillMapService;
+    public ColaboradorController(ColaboradorService colaboradorService) {
+        this.colaboradorService = colaboradorService;
     }
     @PostMapping
-    public ResponseEntity<SkillMap> createSkillMap(@RequestBody SkillMap skillMap) {
-        return ResponseEntity.ok(skillMapService.saveSkillMap(skillMap));
+    public ResponseEntity<Colaborador> create(@RequestBody Colaborador colaborador) {
+        return new ResponseEntity<>(colaboradorService.save(colaborador), HttpStatus.CREATED);
+    }
+    @GetMapping
+    public ResponseEntity<Iterable<Colaborador>> getAll() {
+        return new ResponseEntity<>(colaboradorService.getAll(), HttpStatus.OK);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Colaborador> getById(@PathVariable Long id) {
+        return new ResponseEntity<>(colaboradorService.getById(id), HttpStatus.OK);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        colaboradorService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
