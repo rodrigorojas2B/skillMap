@@ -195,5 +195,19 @@
         }
       }
     }
+    {
+      "name": "createSkillMap",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/skillmap",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api","skillmap"]
+        }
+      }
+    }
   ]
 }
