@@ -1,0 +1,20 @@
+- id: HDU001
+  title: Crear y gestionar categorías de skills
+**Historia de Usuario:**  
+Como **administrador**,  
+quiero **crear, listar, actualizar y eliminar categorías de skills desde la interfaz web**,  
+para **estructurar el catálogo de habilidades, facilitar su búsqueda y permitir filtrarlas por categoría**.
+
+**Criterios de Aceptación:**  
+- *Dado* que el administrador accede a la sección de categorías, *cuando* crea una nueva categoría con un nombre válido, *entonces* la categoría aparece en la lista y se muestra un mensaje de confirmación.  
+- *Dado* que el administrador intenta crear una categoría sin nombre, *cuando* intenta guardarla, *entonces* el sistema bloquea la acción y muestra un mensaje de error indicando que el nombre es obligatorio.  
+- *Dado* que el administrador intenta crear una categoría con un nombre ya existente, *cuando* intenta guardarla, *entonces* el sistema muestra un mensaje de error indicando que la categoría ya existe.  
+- *Dado* que una categoría está asignada a uno o más skills, *cuando* el administrador intenta eliminarla, *entonces* el sistema impide la acción y muestra un mensaje de advertencia.  
+- *Dado* que el administrador edita una categoría existente con un nombre válido y no duplicado, *cuando* guarda los cambios, *entonces* la actualización se refleja en la lista y se muestra un mensaje de éxito.
+
+**Notas Adicionales:**  
+- No se identifican restricciones técnicas ni no funcionales relevantes para esta historia.
+
+**Prioridad:** TBD  
+**Etiqueta/Epic:** Gestión de Skills
+
