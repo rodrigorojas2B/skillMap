@@ -150,11 +150,13 @@ jobs:
           echo "🔍 Verificando si hay clases NUEVA o MODIFICABLE..."
       
           if grep -Eq '\|\s+(NUEVA|MODIFICABLE)\s+\|' diagnostico_gpt.txt; then
-            echo "✅ Se requieren cambios en el código. Continuando..."
+            echo "Se requieren cambios en el código."
           else
-            echo "🛑 La HDU no requiere cambios en el código. Terminando el workflow."
-            exit 0
+            echo "La HDU no requiere cambios en el código. Terminando el workflow."
+            echo "::notice title=Análisis completo::La historia no requiere cambios en el código."
+            exit 78  # código de salida especial que GitHub interpreta como "canceled"
           fi
+        
         
 
       - name: Mostrar análisis GPT
