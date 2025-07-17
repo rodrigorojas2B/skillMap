@@ -143,6 +143,20 @@ jobs:
 
           jq -r '.choices[0].message.content // "❌ GPT no devolvió contenido válido."' respuesta_gpt_diagnostico.json > diagnostico_gpt.txt
 
+      - name: Validar si se requieren cambios de código
+        run: |
+          cd repositorio-base
+      
+          echo "🔍 Verificando si hay clases NUEVA o MODIFICABLE..."
+      
+          if grep -Eq '\|\s+(NUEVA|MODIFICABLE)\s+\|' diagnostico_gpt.txt; then
+            echo "✅ Se requieren cambios en el código. Continuando..."
+          else
+            echo "🛑 La HDU no requiere cambios en el código. Terminando el workflow."
+            exit 0
+          fi
+        
+
       - name: Mostrar análisis GPT
         run: |
           echo "📋 Tabla de diagnóstico de clases:"
