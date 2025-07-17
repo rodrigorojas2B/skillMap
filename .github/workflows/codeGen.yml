@@ -144,6 +144,7 @@ jobs:
           - Si una tabla existe en el modelo.sql pero no tiene clase correspondiente en las clases existentes, debes proponer una clase NUEVA que la represente.
           - Si ya existe una clase que representa una tabla, debes indicar si puede reutilizarse o si debe modificarse, justificando tu decisión.
           - Utiliza nombres de clases y atributos consistentes con las tablas y columnas del modelo.sql, aplicando convenciones Java (camelCase, PascalCase).
+          - Todas las clases sugeridas deben estar en la tabla Markdown, no sugerir creación o modificación de clases fuera de esa tabla.
           
           --- CÓDIGO A GENERAR ---
           Devuelve solo clases Java válidas. Cada bloque debe comenzar con `package ...`.
