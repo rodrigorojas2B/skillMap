@@ -94,15 +94,40 @@ jobs:
       
           cat <<'EOF' >> entrada_gpt.txt
         
+          --- DISEÑO DEL FLUJO NECESARIO PARA LA HDU ---
+            Antes de analizar las clases existentes, define lo siguiente:
+            
+            1. ¿Cuál es la API REST esperada para implementar la historia de usuario? Define el o los endpoints requeridos, con sus métodos (GET/POST/etc), path y parámetros de entrada/salida.
+            
+            2. ¿Qué operaciones de negocio se requieren y cómo se deberían estructurar los servicios? Define los métodos clave del servicio y su lógica general.
+            
+            3. ¿Qué entidades (modelos o entidades JPA) se necesitan para representar los datos manejados por la historia de usuario? Enumera los nombres esperados y atributos principales.
+            
+            4. ¿Cuál sería el flujo general desde el Controller hasta el Repository y la Entity? Describe paso a paso cómo viaja la información, incluyendo las clases involucradas y cómo se relacionan.
+            
+            Este diseño preliminar será usado para identificar qué clases son necesarias.
+            
           --- ANÁLISIS DE CLASES EXISTENTES ---
-          Genera una tabla Markdown como esta:
+          Ahora, en base al diseño anterior, analiza las clases del proyecto actual y genera una tabla Markdown como esta:
           
           | Clase Java | Package | Clasificación | Motivo |
           |------------|---------|----------------|--------|
-          | Employee | com.example.EmployeeCoreApi.model | REUTILIZABLE-AS-IS | Contiene atributo `gender` |
-          | EmployeeServiceImpl | com.example.EmployeeCoreApi.service.impl | MODIFICABLE | Debe validar antes de borrar |
-          | CannotDeleteEmployeeException | com.example.EmployeeCoreApi.exception | NUEVA | Requerida para lanzar excepción |
-          | EmployeeServiceImplTest | com.example.EmployeeCoreApi.service.impl | NUEVA | Pruebas unitarias de validación |
+          | Employee | com.example.EmployeeCoreApi.model | REUTILIZABLE-AS-IS | Contiene atributo `gender` utilizado para validación en el servicio |
+          | EmployeeServiceImpl | com.example.EmployeeCoreApi.service.impl | MODIFICABLE | Se requiere agregar lógica de validación según la HDU |
+          | CannotDeleteEmployeeException | com.example.EmployeeCoreApi.exception | NUEVA | Necesaria para lanzar error si se intenta borrar empleado no permitido |
+          
+          --- CRITERIOS IMPORTANTES ---
+          - Solo deben incluirse en la tabla las clases que **realmente participan en el flujo de implementación** de la historia de usuario.
+          - No incluyas clases que no se usan o que no están relacionadas con los pasos definidos anteriormente.
+          - Una clase solo debe marcarse como `REUTILIZABLE-AS-IS` si se utiliza tal como está, sin modificaciones.
+          - Si una clase ya existe pero necesita modificaciones, márcala como `MODIFICABLE` y explica por qué.
+          - Si se necesita una clase que no existe, márcala como `NUEVA` y justifica su creación.
+          - Usa el modelo de datos proporcionado en `modelo.sql` como referencia para las entidades.
+          - No asumas la existencia de clases que no estén listadas ni presentes en el código entregado.
+          
+          --- FORMATO DE RESPUESTA ---
+          Primero entrega el diseño de API, flujo y entidades como texto estructurado.
+          Luego, entrega la tabla Markdown con la clasificación de clases relevantes.
           
           --- INSTRUCCIONES DE MODIFICACIÓN ---
           - No eliminar ni reemplazar lógica existente.
