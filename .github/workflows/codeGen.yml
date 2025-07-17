@@ -70,11 +70,17 @@ jobs:
           echo -e "\n\n--- HISTORIA DE USUARIO ---" > entrada_gpt.txt
           cat "${{ steps.historia.outputs.ruta }}" >> entrada_gpt.txt
       
+          echo -e "\n\n--- MODELO DE DATOS DEL PROYECTO ---" >> entrada_gpt.txt
+          if [ -f modelo/modelo.sql ]; then
+            cat modelo/modelo.sql >> entrada_gpt.txt
+          else
+            echo "-- ⚠️ Archivo modelo.sql no encontrado en carpeta 'modelo'." >> entrada_gpt.txt
+          fi
+      
           echo -e "\n\n--- CLASES DISPONIBLES EN EL PROYECTO ---" >> entrada_gpt.txt
-          cat clases_existentes.txt | sed 's|.*/||' | sed 's|\.java||' >> entrada_gpt.txt
+          sed -E 's|.*/([^/]+)\.java$|\1|' clases_existentes.txt >> entrada_gpt.txt
       
           echo -e "\n\n--- CÓDIGO EXISTENTE DEL PROYECTO ---" >> entrada_gpt.txt
-      
           while read -r clase; do
             echo -e "\n\n// Archivo: $clase\n" >> entrada_gpt.txt
       
@@ -87,36 +93,40 @@ jobs:
           done < clases_existentes.txt
       
           cat <<'EOF' >> entrada_gpt.txt
-      
+        
           --- ANÁLISIS DE CLASES EXISTENTES ---
           Genera una tabla Markdown como esta:
-      
+          
           | Clase Java | Package | Clasificación | Motivo |
           |------------|---------|----------------|--------|
           | Employee | com.example.EmployeeCoreApi.model | REUTILIZABLE-AS-IS | Contiene atributo `gender` |
           | EmployeeServiceImpl | com.example.EmployeeCoreApi.service.impl | MODIFICABLE | Debe validar antes de borrar |
           | CannotDeleteEmployeeException | com.example.EmployeeCoreApi.exception | NUEVA | Requerida para lanzar excepción |
           | EmployeeServiceImplTest | com.example.EmployeeCoreApi.service.impl | NUEVA | Pruebas unitarias de validación |
-      
+          
           --- INSTRUCCIONES DE MODIFICACIÓN ---
           - No eliminar ni reemplazar lógica existente.
           - Si se modifica un método, incluirlo completo con el nuevo código y lo que ya tenía.
           - Solo generar clases nuevas si están indicadas como NUEVA.
           - Cada clase debe estar en su package correcto, según lo indicado en la tabla.
           - NO repetir clases ya existentes si no cambian.
-          - NO eliminar los métodos existentes a menos que sea necesario
-          - NO reemplazar métodos u otro contenido de las clases existentes por comentarios entre líneas
+          - NO eliminar los métodos existentes a menos que sea necesario.
+          - NO reemplazar métodos u otro contenido de las clases existentes por comentarios entre líneas.
           - Solo considerar como existente una clase si está listada explícitamente en "CLASES DISPONIBLES EN EL PROYECTO".
           - No debes asumir la existencia de clases que no aparecen explícitamente en la sección anterior. Si alguna clase no está listada entre las clases disponibles ni aparece en el código entregado, debe considerarse INEXISTENTE y marcada como NUEVA en el análisis.
           - Si una clase no aparece listada, asumir que es NUEVA.
-          - Usa la bibliotec Lombok para el encapsulamiento.
-          - Si una clase herada de otra clase o importa una interfaz propia del proyecto asegúrate que esta esté entre las clases existentes o genera el código respectivo de no existir previamente
-      
+          - Usa la biblioteca Lombok para el encapsulamiento.
+          - Si una clase hereda de otra clase o importa una interfaz propia del proyecto asegúrate de que esta esté entre las clases existentes o genera el código respectivo de no existir previamente.
+          - El archivo modelo.sql contiene la definición del modelo de datos. Úsalo como referencia para determinar qué entidades, atributos o estructuras deben mapearse a clases Java.
+          - Si una tabla existe en el modelo.sql pero no tiene clase correspondiente en las clases existentes, debes proponer una clase NUEVA que la represente.
+          - Si ya existe una clase que representa una tabla, debes indicar si puede reutilizarse o si debe modificarse, justificando tu decisión.
+          - Utiliza nombres de clases y atributos consistentes con las tablas y columnas del modelo.sql, aplicando convenciones Java (camelCase, PascalCase).
+          
           --- CÓDIGO A GENERAR ---
           Devuelve solo clases Java válidas. Cada bloque debe comenzar con `package ...`.
           Incluye los tests JUnit5 en el mismo formato si aplica.
           EOF
-      
+        
 
       - name: Llamar a OpenAI para diagnóstico (solo análisis y clasificación)
         env:
