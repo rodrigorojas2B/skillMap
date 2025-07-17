@@ -2,10 +2,4 @@
   title: Registrar sesiones de evaluación de skills
   descripcion: Como colaborador, quiero registrar mi autoevaluación y que luego un
     calibrador pueda ajustarla, para tener una evaluación técnica objetiva.
-  entidad: SkillFit
-  campos:
-  - id_colaborador
-  - id_calibrador
-  - fecha_autoeval
-  - fecha_calibracion
-  - descripcion
+ 

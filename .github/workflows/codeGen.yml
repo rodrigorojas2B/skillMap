@@ -128,7 +128,7 @@ jobs:
           --- FORMATO DE RESPUESTA ---
           Primero entrega el diseño de API, flujo y entidades como texto estructurado.
           Luego, entrega la tabla Markdown con la clasificación de clases relevantes.
-          
+
           --- INSTRUCCIONES DE MODIFICACIÓN ---
           - No eliminar ni reemplazar lógica existente.
           - Si se modifica un método, incluirlo completo con el nuevo código y lo que ya tenía.
@@ -144,7 +144,6 @@ jobs:
           - Si una clase del proyecto no se usa en el flujo de la historia evaluada, NO la incluyas en la tabla, aunque esté disponible.
           - Una clase solo debe marcarse como `REUTILIZABLE-AS-IS` si va a ser efectivamente utilizada **sin modificaciones** como parte del cumplimiento de la historia de usuario.
           - El objetivo es enfocarse en el subconjunto mínimo de clases necesarias para implementar la funcionalidad, y no generar ruido con clases irrelevantes al caso de uso.          
-          - Usa la biblioteca Lombok para el encapsulamiento.
           - Si una clase hereda de otra clase o importa una interfaz propia del proyecto asegúrate de que esta esté entre las clases existentes o genera el código respectivo de no existir previamente.
           - El archivo modelo.sql contiene la definición del modelo de datos. Úsalo como referencia para determinar qué entidades, atributos o estructuras deben mapearse a clases Java.
           - Si una tabla existe en el modelo.sql pero no tiene clase correspondiente en las clases existentes, debes proponer una clase NUEVA que la represente.
@@ -232,6 +231,7 @@ jobs:
           - No incluyas explicaciones ni comentarios adicionales.
           - Si una clase existente implementa una interfaz, o hereda de otra clase, debes mantener esa declaración `implements o extends ...`.
           - No elimines implementaciones de interfaces ya declaradas.
+          - Usa la biblioteca Lombok para el encapsulamiento.
           - La firma de las clases y métodos debe mantenerse sin cambio a menos que la nueva funcionalidad lo requiera
           - Si se crea una llamada a un método de la clase modificada asegúrate que ese método exista en la clase
           - Si se crea una llamada a un método de otra clase asegúrate que ese método exista en la clase o créalo de ser necesario
