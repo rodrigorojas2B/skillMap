@@ -109,6 +109,7 @@ jobs:
           - Solo considerar como existente una clase si está listada explícitamente en "CLASES DISPONIBLES EN EL PROYECTO".
           - No debes asumir la existencia de clases que no aparecen explícitamente en la sección anterior. Si alguna clase no está listada entre las clases disponibles ni aparece en el código entregado, debe considerarse INEXISTENTE y marcada como NUEVA en el análisis.
           - Si una clase no aparece listada, asumir que es NUEVA.
+          - Usa la bibliotec Lombok para el encapsulamiento.
           - Si una clase herada de otra clase o importa una interfaz propia del proyecto asegúrate que esta esté entre las clases existentes o genera el código respectivo de no existir previamente
       
           --- CÓDIGO A GENERAR ---
