@@ -144,8 +144,8 @@ jobs:
           - Si una tabla existe en el modelo.sql pero no tiene clase correspondiente en las clases existentes, debes proponer una clase NUEVA que la represente.
           - Si ya existe una clase que representa una tabla, debes indicar si puede reutilizarse o si debe modificarse, justificando tu decisión.
           - Utiliza nombres de clases y atributos consistentes con las tablas y columnas del modelo.sql, aplicando convenciones Java (camelCase, PascalCase).
-          - Todas las clases sugeridas deben estar en la tabla Markdown, no sugerir creación o modificación de clases fuera de esa tabla.
-          
+          - Las clases sugeridas deben estar todas dentro de la tabla Markdown con el detalle de si es REUTILIZABLE-AS-IS, MODIFICABLE o NUEVA.
+
           --- CÓDIGO A GENERAR ---
           Devuelve solo clases Java válidas. Cada bloque debe comenzar con `package ...`.
           Incluye los tests JUnit5 en el mismo formato si aplica.
@@ -177,7 +177,19 @@ jobs:
 
           jq -r '.choices[0].message.content // "❌ GPT no devolvió contenido válido."' respuesta_gpt_diagnostico.json > diagnostico_gpt.txt
 
-
+      - name: Validar si se requieren cambios de código
+        run: |
+          cd repositorio-base
+      
+          echo "🔍 Verificando si hay clases NUEVA o MODIFICABLE..."
+      
+          if grep -Eq '\|\s+(NUEVA|MODIFICABLE)\s+\|' diagnostico_gpt.txt; then
+            echo "Se requieren cambios en el código."
+          else
+            echo "La HDU no requiere cambios en el código. Terminando el workflow."
+            echo "::notice title=Análisis completo::La historia no requiere cambios en el código."
+            exit 78  # código de salida especial que GitHub interpreta como "canceled"
+          fi
         
         
 
@@ -192,20 +204,6 @@ jobs:
             ls -l repositorio-base/
           fi
         
-      - name: Validar si se requieren cambios de código
-        run: |
-          cd repositorio-base
-      
-          echo "🔍 Verificando si hay clases NUEVA o MODIFICABLE..."
-      
-          if grep -Eq '\|\s+(NUEVA|MODIFICABLE)\s+\|' diagnostico_gpt.txt; then
-            echo "Se requieren cambios en el código."
-          else
-            echo "La HDU no requiere cambios en el código. Terminando el workflow."
-            echo "::notice title=Análisis completo::La historia no requiere cambios en el código."
-            exit 78  # código de salida especial que GitHub interpreta como "canceled"
-          fi
-
       - name: Preparar entrada para generación de código
         run: |
           cd repositorio-base
