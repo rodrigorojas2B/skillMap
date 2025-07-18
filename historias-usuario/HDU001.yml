@@ -3,7 +3,7 @@
 **Historia de Usuario:**  
 Como **administrador**,  
 quiero **crear, listar, actualizar y eliminar categorías de skills desde la interfaz web**,  
-para **estructurar el catálogo de habilidades, facilitar su búsqueda y permitir filtrarlas por categoría**.
+para **estructurar el catálogo de habilidades,  facilitar su búsqueda y permitir filtrarlas por categoría**.
 
 **Criterios de Aceptación:**  
 - *Dado* que el administrador accede a la sección de categorías, *cuando* crea una nueva categoría con un nombre válido, *entonces* la categoría aparece en la lista y se muestra un mensaje de confirmación.  
