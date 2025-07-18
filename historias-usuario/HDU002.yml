@@ -4,7 +4,7 @@
 *Como Admin de talento, quiero **editar el nombre de una categoría existente**, para **mantener la coherencia y la comprensión de la taxonomía de skills***.
 
 **Criterios de Aceptación:**
-- Dado que soy un Admin de talento autenticado,  
+- Dado que soy un Admin de talento  autenticado,  
   Cuando selecciono una categoría y actualizo su nombre con uno válido,  
   Entonces el sistema guarda el nuevo nombre y lo refleja en la lista de categorías.
 - Dado que el nuevo nombre ya existe,  
