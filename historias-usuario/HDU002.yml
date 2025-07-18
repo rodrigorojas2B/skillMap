@@ -9,7 +9,7 @@
   Entonces el sistema guarda el nuevo nombre y lo refleja en la lista de categorías.
 - Dado que el nuevo nombre ya existe,  
   Cuando intento guardar los cambios,  
-  Entonces el sistema muestra un mensaje "El nombre de la categoría ya está en uso" y no actualiza la categoría.
+  Entonces el sistema muestra un mensaje  "El nombre de la categoría ya está en uso" y no actualiza la categoría.
 - Dado que cancelo la edición,  
   Cuando hago clic en "Cancelar",  
   Entonces el sistema descarta los cambios y mantiene el nombre original.

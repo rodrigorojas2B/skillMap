@@ -223,7 +223,7 @@ jobs:
           - Crea nuevas clases solo si están indicadas como NUEVA.
           - No cambies de paquete ni nombre de clase.
           - Si modificas un método, inclúyelo completo con su lógica anterior más la nueva.
-          - No omitas lógica existente.
+          - No borres lógica existente, ni pongas comentarios en vez del código (del tipo "// Other fields..." o "// Other methods...")
           - Cada clase debe comenzar con `package ...`.
           - Devuelve únicamente clases y tests JUnit 5 válidos.
           - No incluyas explicaciones ni comentarios adicionales.
