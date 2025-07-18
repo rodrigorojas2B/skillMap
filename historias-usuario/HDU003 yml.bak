@@ -1,17 +1,20 @@
-- id: HDU003
-  title: Asociar contenido de aprendizaje a skills
-  descripcion: Como administrador, quiero poder asociar cursos y pruebas a un skill,
-    indicando el nivel objetivo (de 1 a 5), para ayudar en la nivelación de colaboradores.
-  entidad: Contenido
-  campos:
-  - nivel
-  - url_curso
-  - url_test
-  - skill_id
-  acciones:
-  - POST
-  - GET
-  - PUT
-  - DELETE
-  validaciones:
-  - nivel entre 1 y 5
+## HDU003 — Eliminar categoría de skills
+
+**Historia de Usuario:**  
+*Como Admin de talento, quiero **eliminar una categoría de skills que ya no se utiliza**, para **mantener el catálogo limpio y evitar confusión***.
+
+**Criterios de Aceptación:**
+- Dado que soy un Admin de talento autenticado,  
+  Cuando selecciono "Eliminar" en una categoría que no contiene skills asociados,  
+  Entonces el sistema solicita confirmación y, al aceptarla, elimina la categoría.
+- Dado que la categoría contiene skills,  
+  Cuando intento eliminarla,  
+  Entonces el sistema muestra un mensaje "No se puede eliminar una categoría con skills asociados".
+- Dado que cancelo la confirmación,  
+  Cuando el diálogo de confirmación está visible y selecciono "Cancelar",  
+  Entonces el sistema no elimina la categoría.
+
+**Notas Adicionales:**  
+- Soft‑delete recomendado para recuperación.
+
+**Prioridad:** TBD
