@@ -1,36 +1,42 @@
-**Diseño de API, flujo y entidades**
+DISEÑO DEL FLUJO NECESARIO PARA LA HDU:
 
-1. API REST esperada:
-    - POST /categorias: Crea una nueva categoría. Parámetros de entrada: nombre de la categoría. Salida: ID de la categoría creada.
-    - GET /categorias: Lista todas las categorías. Sin parámetros de entrada. Salida: lista de categorías.
-    - PUT /categorias/{id}: Actualiza una categoría existente. Parámetros de entrada: ID de la categoría, nuevo nombre. Sin salida.
-    - DELETE /categorias/{id}: Elimina una categoría existente. Parámetros de entrada: ID de la categoría. Sin salida.
+1. API REST esperada para implementar la historia de usuario:
 
-2. Operaciones de negocio:
-    - Crear una nueva categoría: Se debe verificar que el nombre no esté vacío y que no exista una categoría con el mismo nombre. Si la verificación es exitosa, se crea la categoría.
-    - Listar todas las categorías: Se obtienen todas las categorías de la base de datos.
-    - Actualizar una categoría: Se debe verificar que el nuevo nombre no esté vacío y que no exista una categoría con el mismo nombre. Si la verificación es exitosa, se actualiza la categoría.
-    - Eliminar una categoría: Se debe verificar que la categoría no esté asignada a ninguna habilidad. Si la verificación es exitosa, se elimina la categoría.
+    - GET /colaboradores: Retorna la lista de todos los colaboradores.
+    - POST /colaboradores: Crea un nuevo colaborador. Recibe en el cuerpo de la petición los datos del colaborador.
+    - GET /colaboradores/{id}: Retorna los datos de un colaborador específico.
+    - PUT /colaboradores/{id}: Actualiza los datos de un colaborador específico. Recibe en el cuerpo de la petición los nuevos datos del colaborador.
+    - DELETE /colaboradores/{id}: Elimina un colaborador específico.
 
-3. Entidades necesarias:
-    - Categoria: Representa una categoría de habilidades. Atributos principales: id, nombre.
-    - Skill: Representa una habilidad. Atributos principales: id, nombre, categoria_id.
+2. Operaciones de negocio requeridas y estructura de servicios:
 
-4. Flujo general:
-    - El Controller recibe la petición y la pasa al Service.
-    - El Service realiza las verificaciones necesarias y llama al Repository.
-    - El Repository interactúa con la base de datos y devuelve los resultados al Service.
-    - El Service devuelve los resultados al Controller, que los envía como respuesta.
+    - Crear un nuevo colaborador: Se debe validar que el ID del colaborador sea único y que la relación con el calibrador sea opcional.
+    - Listar todos los colaboradores: No se requiere validación adicional.
+    - Obtener los datos de un colaborador específico: Se debe validar que el colaborador exista.
+    - Actualizar los datos de un colaborador específico: Se debe validar que el colaborador exista y que el nuevo ID sea único.
+    - Eliminar un colaborador específico: Se debe validar que el colaborador exista.
 
-**Análisis de clases existentes**
+3. Entidades necesarias para representar los datos:
+
+    - Colaborador: Con los atributos id, nombre, paterno, materno, id_calibrador_actual.
+
+4. Flujo general desde el Controller hasta el Repository y la Entity:
+
+    - El Controller recibe la petición HTTP y la pasa al Servicio.
+    - El Servicio realiza las validaciones necesarias y utiliza el Repository para interactuar con la base de datos.
+    - El Repository utiliza la Entity para mapear los datos de la base de datos a objetos Java y viceversa.
+
+ANÁLISIS DE CLASES EXISTENTES:
 
 | Clase Java | Package | Clasificación | Motivo |
 |------------|---------|----------------|--------|
-| BackendApplication | com.skillmap.backend | REUTILIZABLE-AS-IS | Clase principal de la aplicación, no necesita modificaciones para esta historia de usuario. |
-| Categoria | com.skillmap.backend.model | NUEVA | Se necesita una nueva clase para representar la entidad Categoria. |
-| CategoriaController | com.skillmap.backend.controller | NUEVA | Se necesita una nueva clase para manejar las peticiones HTTP relacionadas con las categorías. |
-| CategoriaService | com.skillmap.backend.service | NUEVA | Se necesita una nueva clase para manejar la lógica de negocio relacionada con las categorías. |
-| CategoriaRepository | com.skillmap.backend.repository | NUEVA | Se necesita una nueva clase para interactuar con la base de datos y manejar las categorías. |
-| Skill | com.skillmap.backend.model | NUEVA | Se necesita una nueva clase para representar la entidad Skill y verificar si una categoría está asignada a alguna habilidad. |
-| SkillRepository | com.skillmap.backend.repository | NUEVA | Se necesita una nueva clase para interactuar con la base de datos y manejar las habilidades. |
-
+| Categoria | com.skillmap.backend.model | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario. |
+| Skill | com.skillmap.backend.model | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario. |
+| CategoriaService | com.skillmap.backend.service | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario. |
+| CategoriaController | com.skillmap.backend.controller | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario. |
+| CategoriaRepository | com.skillmap.backend.repository | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario. |
+| SkillRepository | com.skillmap.backend.repository | REUTILIZABLE-AS-IS | No se requiere ninguna modificación para esta historia de usuario. |
+| Colaborador | N/A | NUEVA | Se necesita una nueva clase para representar la entidad Colaborador. |
+| ColaboradorService | N/A | NUEVA | Se necesita una nueva clase para implementar la lógica de negocio relacionada con los colaboradores. |
+| ColaboradorController | N/A | NUEVA | Se necesita una nueva clase para manejar las peticiones HTTP relacionadas con los colaboradores. |
+| ColaboradorRepository | N/A | NUEVA | Se necesita una nueva clase para interactuar con la base de datos de los colaboradores. |

@@ -5,6 +5,80 @@
   },
   "item": [
     {
+      "name": "createColaborador",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/colaboradores",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["colaboradores"]
+        }
+      }
+    }
+,
+    {
+      "name": "getColaboradorById",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/colaboradores",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["colaboradores"]
+        }
+      }
+    }
+,
+    {
+      "name": "getColaboradorById",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/colaboradores/{id}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["colaboradores","{id}"]
+        }
+      }
+    }
+,
+    {
+      "name": "updateColaborador",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/colaboradores/{id}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["colaboradores","{id}"]
+        }
+      }
+    }
+,
+    {
+      "name": "deleteColaborador",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/colaboradores/{id}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["colaboradores","{id}"]
+        }
+      }
+    }
+    {
       "name": "crearCategoria",
       "request": {
         "method": "POST",
