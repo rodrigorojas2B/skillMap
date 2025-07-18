@@ -147,7 +147,7 @@ jobs:
           - Las clases sugeridas deben estar todas dentro de la tabla Markdown con el detalle de si es REUTILIZABLE-AS-IS, MODIFICABLE o NUEVA.
 
           --- CÓDIGO A GENERAR ---
-          Devuelve solo clases Java válidas. Cada bloque debe comenzar con `package ...`.
+          Devuelve solo clases Java válidas. Cada  bloque debe comenzar con `package ...`.
           Incluye los tests JUnit5 en el mismo formato si aplica.
           EOF
         
