@@ -3,115 +3,121 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+@Data
 @Entity
-public class Colaborador {
+public class Categoria {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
     private String nombre;
-    private String paterno;
-    private String materno;
-    
-    @OneToOne
-    private Colaborador calibrador;
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getNombre() {
-        return nombre;
-    }
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-    public String getPaterno() {
-        return paterno;
-    }
-    public void setPaterno(String paterno) {
-        this.paterno = paterno;
-    }
-    public String getMaterno() {
-        return materno;
-    }
-    public void setMaterno(String materno) {
-        this.materno = materno;
-    }
-    public Colaborador getCalibrador() {
-        return calibrador;
-    }
-    public void setCalibrador(Colaborador calibrador) {
-        this.calibrador = calibrador;
-    }
+}
+package com.skillmap.backend.model;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+@Data
+@Entity
+public class Skill {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @NotBlank
+    private String nombre;
+    @ManyToOne
+    private Categoria categoria;
 }
 package com.skillmap.backend.repository;
-import org.springframework.data.repository.CrudRepository;
-import com.skillmap.backend.model.Colaborador;
-public interface ColaboradorRepository extends CrudRepository<Colaborador, Long> {
+import com.skillmap.backend.model.Categoria;
+import org.springframework.data.jpa.repository.JpaRepository;
+public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
+    boolean existsByNombre(String nombre);
+}
+package com.skillmap.backend.repository;
+import com.skillmap.backend.model.Categoria;
+import com.skillmap.backend.model.Skill;
+import org.springframework.data.jpa.repository.JpaRepository;
+public interface SkillRepository extends JpaRepository<Skill, Long> {
+    boolean existsByCategoria(Categoria categoria);
 }
 package com.skillmap.backend.service;
+import com.skillmap.backend.model.Categoria;
+import com.skillmap.backend.repository.CategoriaRepository;
+import com.skillmap.backend.repository.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.skillmap.backend.model.Colaborador;
-import com.skillmap.backend.repository.ColaboradorRepository;
+import java.util.List;
 @Service
-public class ColaboradorService {
-    private final ColaboradorRepository colaboradorRepository;
+public class CategoriaService {
     @Autowired
-    public ColaboradorService(ColaboradorRepository colaboradorRepository) {
-        this.colaboradorRepository = colaboradorRepository;
+    private CategoriaRepository categoriaRepository;
+    @Autowired
+    private SkillRepository skillRepository;
+    public Categoria crearCategoria(Categoria categoria) {
+        if (categoria.getNombre() == null || categoria.getNombre().isEmpty()) {
+            throw new IllegalArgumentException("El nombre de la categoría no puede estar vacío.");
+        }
+        if (categoriaRepository.existsByNombre(categoria.getNombre())) {
+            throw new IllegalArgumentException("Ya existe una categoría con ese nombre.");
+        }
+        return categoriaRepository.save(categoria);
     }
-    public Colaborador save(Colaborador colaborador) {
-        return colaboradorRepository.save(colaborador);
+    public List<Categoria> listarCategorias() {
+        return categoriaRepository.findAll();
     }
-    public Iterable<Colaborador> getAll() {
-        return colaboradorRepository.findAll();
+    public Categoria actualizarCategoria(Long id, Categoria categoria) {
+        if (categoria.getNombre() == null || categoria.getNombre().isEmpty()) {
+            throw new IllegalArgumentException("El nombre de la categoría no puede estar vacío.");
+        }
+        if (categoriaRepository.existsByNombre(categoria.getNombre())) {
+            throw new IllegalArgumentException("Ya existe una categoría con ese nombre.");
+        }
+        Categoria categoriaExistente = categoriaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("La categoría no existe."));
+        categoriaExistente.setNombre(categoria.getNombre());
+        return categoriaRepository.save(categoriaExistente);
     }
-    public Colaborador getById(Long id) {
-        return colaboradorRepository.findById(id).orElse(null);
-    }
-    public void delete(Long id) {
-        colaboradorRepository.deleteById(id);
+    public void eliminarCategoria(Long id) {
+        Categoria categoria = categoriaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("La categoría no existe."));
+        if (skillRepository.existsByCategoria(categoria)) {
+            throw new IllegalArgumentException("La categoría está asignada a una o más habilidades.");
+        }
+        categoriaRepository.delete(categoria);
     }
 }
 package com.skillmap.backend.controller;
+import com.skillmap.backend.model.Categoria;
+import com.skillmap.backend.service.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.skillmap.backend.model.Colaborador;
-import com.skillmap.backend.service.ColaboradorService;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 @RestController
-@RequestMapping("/api/colaboradores")
-public class ColaboradorController {
-    private final ColaboradorService colaboradorService;
+@RequestMapping("/categorias")
+public class CategoriaController {
     @Autowired
-    public ColaboradorController(ColaboradorService colaboradorService) {
-        this.colaboradorService = colaboradorService;
-    }
+    private CategoriaService categoriaService;
     @PostMapping
-    public ResponseEntity<Colaborador> create(@RequestBody Colaborador colaborador) {
-        return new ResponseEntity<>(colaboradorService.save(colaborador), HttpStatus.CREATED);
+    public ResponseEntity<Categoria> crearCategoria(@RequestBody Categoria categoria) {
+        return new ResponseEntity<>(categoriaService.crearCategoria(categoria), HttpStatus.CREATED);
     }
     @GetMapping
-    public ResponseEntity<Iterable<Colaborador>> getAll() {
-        return new ResponseEntity<>(colaboradorService.getAll(), HttpStatus.OK);
+    public ResponseEntity<List<Categoria>> listarCategorias() {
+        return new ResponseEntity<>(categoriaService.listarCategorias(), HttpStatus.OK);
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<Colaborador> getById(@PathVariable Long id) {
-        return new ResponseEntity<>(colaboradorService.getById(id), HttpStatus.OK);
+    @PutMapping("/{id}")
+    public ResponseEntity<Categoria> actualizarCategoria(@PathVariable Long id, @RequestBody Categoria categoria) {
+        return new ResponseEntity<>(categoriaService.actualizarCategoria(id, categoria), HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        colaboradorService.delete(id);
+    public ResponseEntity<Void> eliminarCategoria(@PathVariable Long id) {
+        categoriaService.eliminarCategoria(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

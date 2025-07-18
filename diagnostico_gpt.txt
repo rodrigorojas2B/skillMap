@@ -1,36 +1,36 @@
---- ANÁLISIS DE CLASES EXISTENTES ---
+**Diseño de API, flujo y entidades**
+
+1. API REST esperada:
+    - POST /categorias: Crea una nueva categoría. Parámetros de entrada: nombre de la categoría. Salida: ID de la categoría creada.
+    - GET /categorias: Lista todas las categorías. Sin parámetros de entrada. Salida: lista de categorías.
+    - PUT /categorias/{id}: Actualiza una categoría existente. Parámetros de entrada: ID de la categoría, nuevo nombre. Sin salida.
+    - DELETE /categorias/{id}: Elimina una categoría existente. Parámetros de entrada: ID de la categoría. Sin salida.
+
+2. Operaciones de negocio:
+    - Crear una nueva categoría: Se debe verificar que el nombre no esté vacío y que no exista una categoría con el mismo nombre. Si la verificación es exitosa, se crea la categoría.
+    - Listar todas las categorías: Se obtienen todas las categorías de la base de datos.
+    - Actualizar una categoría: Se debe verificar que el nuevo nombre no esté vacío y que no exista una categoría con el mismo nombre. Si la verificación es exitosa, se actualiza la categoría.
+    - Eliminar una categoría: Se debe verificar que la categoría no esté asignada a ninguna habilidad. Si la verificación es exitosa, se elimina la categoría.
+
+3. Entidades necesarias:
+    - Categoria: Representa una categoría de habilidades. Atributos principales: id, nombre.
+    - Skill: Representa una habilidad. Atributos principales: id, nombre, categoria_id.
+
+4. Flujo general:
+    - El Controller recibe la petición y la pasa al Service.
+    - El Service realiza las verificaciones necesarias y llama al Repository.
+    - El Repository interactúa con la base de datos y devuelve los resultados al Service.
+    - El Service devuelve los resultados al Controller, que los envía como respuesta.
+
+**Análisis de clases existentes**
 
 | Clase Java | Package | Clasificación | Motivo |
 |------------|---------|----------------|--------|
-| Contenido | com.skillmap.backend.model | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| Skill | com.skillmap.backend.model | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| Especialidad | com.skillmap.backend.model | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| Rol | com.skillmap.backend.model | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| SkillMap | com.skillmap.backend.model | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| Categoria | com.skillmap.backend.model | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| SkillController | com.skillmap.backend.controller | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| CategoriaController | com.skillmap.backend.controller | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| ContenidoController | com.skillmap.backend.controller | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| RolController | com.skillmap.backend.controller | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| SkillMapController | com.skillmap.backend.controller | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| SkillMapRepository | com.skillmap.backend.repository | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| ContenidoRepository | com.skillmap.backend.repository | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| SkillRepository | com.skillmap.backend.repository | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| RolRepository | com.skillmap.backend.repository | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| CategoriaRepository | com.skillmap.backend.repository | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| ContenidoService | com.skillmap.backend.service | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| SkillService | com.skillmap.backend.service | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| SkillMapService | com.skillmap.backend.service | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| RolService | com.skillmap.backend.service | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| CategoriaService | com.skillmap.backend.service | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| BackendApplication | com.skillmap.backend | MODIFICABLE | No requiere cambios para la historia de usuario, pero podría requerir modificaciones para futuras historias |
-| Colaborador | N/A | NUEVA | Clase necesaria para la historia de usuario |
-| ColaboradorController | N/A | NUEVA | Clase necesaria para la historia de usuario |
-| ColaboradorService | N/A | NUEVA | Clase necesaria para la historia de usuario |
-| ColaboradorRepository | N/A | NUEVA | Clase necesaria para la historia de usuario |
+| BackendApplication | com.skillmap.backend | REUTILIZABLE-AS-IS | Clase principal de la aplicación, no necesita modificaciones para esta historia de usuario. |
+| Categoria | com.skillmap.backend.model | NUEVA | Se necesita una nueva clase para representar la entidad Categoria. |
+| CategoriaController | com.skillmap.backend.controller | NUEVA | Se necesita una nueva clase para manejar las peticiones HTTP relacionadas con las categorías. |
+| CategoriaService | com.skillmap.backend.service | NUEVA | Se necesita una nueva clase para manejar la lógica de negocio relacionada con las categorías. |
+| CategoriaRepository | com.skillmap.backend.repository | NUEVA | Se necesita una nueva clase para interactuar con la base de datos y manejar las categorías. |
+| Skill | com.skillmap.backend.model | NUEVA | Se necesita una nueva clase para representar la entidad Skill y verificar si una categoría está asignada a alguna habilidad. |
+| SkillRepository | com.skillmap.backend.repository | NUEVA | Se necesita una nueva clase para interactuar con la base de datos y manejar las habilidades. |
 
---- INSTRUCCIONES DE MODIFICACIÓN ---
-- Crear la clase `Colaborador` en el paquete `com.skillmap.backend.model` con los atributos `id`, `nombre`, `paterno`, `materno` y `id_calibrador_actual`.
-- Crear la clase `ColaboradorController` en el paquete `com.skillmap.backend.controller` con los métodos necesarios para manejar las solicitudes HTTP relacionadas con los colaboradores.
-- Crear la clase `ColaboradorService` en el paquete `com.skillmap.backend.service` con los métodos necesarios para manejar la lógica de negocio relacionada con los colaboradores.
-- Crear la clase `ColaboradorRepository` en el paquete `com.skillmap.backend.repository` con los métodos necesarios para manejar las operaciones de base de datos relacionadas con los colaboradores.

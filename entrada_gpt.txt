@@ -1,662 +1,115 @@
 
 
 --- HISTORIA DE USUARIO ---
-- id: HDU006
-  title: Registrar y mantener colaboradores
-  descripcion: Como administrador, quiero registrar los colaboradores activos en la
-    organización para luego evaluar sus skills.
-  entidad: Colaborador
-  campos:
-  - id
-  - nombre
-  - paterno
-  - materno
-  - id_calibrador_actual
-  validaciones:
-  - id único
-  - relación opcional a otro colaborador como calibrador
+- id: HDU001
+  title: Crear y gestionar categorías de skills
+**Historia de Usuario:**  
+Como **administrador**,  
+quiero **crear, listar, actualizar y eliminar categorías de skills desde la interfaz web**,  
+para **estructurar el catálogo de habilidades,  facilitar su búsqueda y permitir filtrarlas por categoría**.
+
+**Criterios de Aceptación:**  
+- *Dado* que el administrador accede a  la sección de categorías, *cuando* crea una nueva categoría con un nombre válido, *entonces* la categoría aparece en la lista y se muestra un mensaje de confirmación.  
+- *Dado* que el administrador intenta crear una categoría sin nombre, *cuando* intenta guardarla, *entonces* el sistema bloquea la acción y muestra un mensaje de error indicando que el nombre es obligatorio.  
+- *Dado* que el administrador  intenta crear una categoría con un nombre ya existente, *cuando* intenta guardarla, *entonces* el sistema muestra un mensaje de error indicando que la categoría ya existe.  
+- *Dado* que una categoría está asignada a uno o más skills, *cuando* el administrador intenta eliminarla, *entonces* el sistema impide la acción y muestra un mensaje de advertencia.  
+- *Dado* que el administrador edita una categoría existente con un nombre válido y no duplicado, *cuando* guarda los cambios, *entonces* la actualización se refleja en la lista y se muestra un mensaje de éxito.
+
+**Notas Adicionales:**  
+- No se identifican restricciones técnicas ni no funcionales relevantes para esta historia.
+
+**Prioridad:** TBD  
+**Etiqueta/Epic:** Gestión de Skills
+
+
+
+--- MODELO DE DATOS DEL PROYECTO ---
+
+-- Tabla de categorías de skills
+CREATE TABLE categoria (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(30) NOT NULL
+);
+
+-- Tabla de skills, asociadas a categoría
+CREATE TABLE skill (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(30) NOT NULL,
+    categoria_id INT REFERENCES categoria(id)
+);
+
+-- Contenido asociado a skills, diseñado para un nivel específico (1 a 5)
+CREATE TABLE contenido (
+    id SERIAL PRIMARY KEY,
+    nivel INT CHECK (nivel BETWEEN 1 AND 5),
+    url_curso TEXT,
+    url_test TEXT,
+    skill_id INT REFERENCES skill(id)
+);
+
+-- Especialidades técnicas
+CREATE TABLE especialidad (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL
+);
+
+-- Roles técnicos (ej. Dev Backend), asociados a una especialidad
+CREATE TABLE rol (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(30) NOT NULL,
+    descripcion VARCHAR(100),
+    especialidad_id INT REFERENCES especialidad(id),
+    grado VARCHAR(20) CHECK (grado IN ('Trainee','Junior','Pleno','Semi-Senior','Senior','Experto'))
+);
+
+-- Nivel esperado por skill en función del rol y grado
+CREATE TABLE skill_map (
+    id SERIAL PRIMARY KEY,
+    rol_id INT REFERENCES rol(id),
+    skill_id INT REFERENCES skill(id),
+    grado VARCHAR(20) CHECK (grado IN ('Trainee','Junior','Pleno','Semi-Senior','Senior','Experto')),
+    nivel_base INT CHECK (nivel_base BETWEEN 1 AND 5),
+    UNIQUE (rol_id, skill_id, grado)
+);
+
+-- Información de colaboradores
+CREATE TABLE colaborador (
+    id VARCHAR(20) PRIMARY KEY, -- Puede ser RUT, DNI, etc.
+    nombre VARCHAR(30) NOT NULL,
+    paterno VARCHAR(30),
+    materno VARCHAR(30),
+    vigente BOOLEAN DEFAULT TRUE,
+    id_calibrador_actual VARCHAR(20) REFERENCES colaborador(id)
+);
+
+-- Evaluación de un colaborador en una fecha determinada
+CREATE TABLE skill_fit (
+    id SERIAL PRIMARY KEY,
+    fecha_autoeval DATE,
+    fecha_calibracion DATE,
+    descripcion VARCHAR(100),
+    id_colaborador VARCHAR(20) REFERENCES colaborador(id),
+    id_calibrador VARCHAR(20) REFERENCES colaborador(id)
+);
+
+-- Evaluación individual por skill dentro de una sesión (fit)
+CREATE TABLE skill_eval (
+    id SERIAL PRIMARY KEY,
+    nivel_autoeval INT CHECK (nivel_autoeval BETWEEN 1 AND 5),
+    nivel_calibrado INT CHECK (nivel_calibrado BETWEEN 1 AND 5),
+    observaciones VARCHAR(100),
+    nota_test NUMERIC(5,2),
+    url_evidencia TEXT,
+    id_skill_fit INT REFERENCES skill_fit(id),
+    id_skill INT REFERENCES skill(id)
+);
+
 
 --- CLASES DISPONIBLES EN EL PROYECTO ---
-Contenido
-Skill
-Especialidad
-Rol
-SkillMap
-Categoria
-SkillController
-CategoriaController
-ContenidoController
-RolController
-SkillMapController
-SkillMapRepository
-ContenidoRepository
-SkillRepository
-RolRepository
-CategoriaRepository
-ContenidoService
-SkillService
-SkillMapService
-RolService
-CategoriaService
 BackendApplication
 
 
 --- CÓDIGO EXISTENTE DEL PROYECTO ---
-
-
-// Archivo: src/main/java/com/skillmap/backend/model/Contenido.java
-
-package com.skillmap.backend.model;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-@Entity
-public class Contenido {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @NotNull
-    @Min(1)
-    @Max(5)
-    private Integer nivel;
-    @NotNull
-    @Column(length = 500)
-    private String url_curso;
-    @NotNull
-    @Column(length = 500)
-    private String url_test;
-    @NotNull
-    private Long skill_id;
-    // getters and setters
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public Integer getNivel() {
-        return nivel;
-    }
-    public void setNivel(Integer nivel) {
-        this.nivel = nivel;
-    }
-    public String getUrl_curso() {
-        return url_curso;
-    }
-    public void setUrl_curso(String url_curso) {
-        this.url_curso = url_curso;
-    }
-    public String getUrl_test() {
-        return url_test;
-    }
-    public void setUrl_test(String url_test) {
-        this.url_test = url_test;
-    }
-    public Long getSkill_id() {
-        return skill_id;
-    }
-    public void setSkill_id(Long skill_id) {
-        this.skill_id = skill_id;
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/model/Skill.java
-
-package com.skillmap.backend.model;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotNull;
-@Entity
-public class Skill {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    @NotNull
-    private String nombre;
-    @ManyToOne
-    @NotNull
-    private Categoria categoria;
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getNombre() {
-        return nombre;
-    }
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-    public Categoria getCategoria() {
-        return categoria;
-    }
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/model/Especialidad.java
-
-package com.skillmap.backend.model;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
-@Entity
-public class Especialidad {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @NotBlank
-    private String nombre;
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getNombre() {
-        return nombre;
-    }
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/model/Rol.java
-
-package com.skillmap.backend.model;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-@Entity
-public class Rol {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @NotBlank
-    @Column(unique = true)
-    private String nombre;
-    @NotBlank
-    private String descripcion;
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "especialidad_id", nullable = false)
-    private Especialidad especialidad;
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private Grado grado;
-    public enum Grado {
-        TRAINEE, JUNIOR, PLENO, SEMI_SENIOR, SENIOR, EXPERTO
-    }
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getNombre() {
-        return nombre;
-    }
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-    public String getDescripcion() {
-        return descripcion;
-    }
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-    public Especialidad getEspecialidad() {
-        return especialidad;
-    }
-    public void setEspecialidad(Especialidad especialidad) {
-        this.especialidad = especialidad;
-    }
-    public Grado getGrado() {
-        return grado;
-    }
-    public void setGrado(Grado grado) {
-        this.grado = grado;
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/model/SkillMap.java
-
-package com.skillmap.backend.model;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-@Entity
-@Table(name = "skill_map")
-public class SkillMap {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @NotNull
-    @Column(name = "rol_id")
-    private Long rolId;
-    @NotNull
-    @Column(name = "grado")
-    private String grado;
-    @NotNull
-    @Column(name = "skill_id")
-    private Long skillId;
-    @NotNull
-    @Min(1)
-    @Max(5)
-    @Column(name = "nivel_base")
-    private Integer nivelBase;
-    // getters and setters
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/model/Categoria.java
-
-package com.skillmap.backend.model;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
-@Entity
-public class Categoria {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @NotBlank
-    private String nombre;
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getNombre() {
-        return nombre;
-    }
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/controller/SkillController.java
-
-package com.skillmap.backend.controller;
-import com.skillmap.backend.model.Contenido;
-import com.skillmap.backend.service.ContenidoService;
-import com.skillmap.backend.service.SkillService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-@RestController
-@RequestMapping("/api/skill")
-public class SkillController {
-    @Autowired
-    private SkillService skillService;
-    @Autowired
-    private ContenidoService contenidoService;
-    // existing methods
-    @PostMapping("/{id}/contenido")
-    public Contenido createContenido(@PathVariable Long id, @RequestBody Contenido contenido) {
-        contenido.setSkill_id(id);
-        return contenidoService.save(contenido);
-    }
-    @GetMapping("/{id}/contenido/{contenidoId}")
-    public Contenido getContenido(@PathVariable Long id, @PathVariable Long contenidoId) {
-        Contenido contenido = contenidoService.get(contenidoId);
-        if (contenido != null && contenido.getSkill_id().equals(id)) {
-            return contenido;
-        }
-        return null;
-    }
-    @PutMapping("/{id}/contenido")
-    public Contenido updateContenido(@PathVariable Long id, @RequestBody Contenido contenido) {
-        if (contenido.getSkill_id().equals(id)) {
-            return contenidoService.update(contenido);
-        }
-        return null;
-    }
-    @DeleteMapping("/{id}/contenido/{contenidoId}")
-    public void deleteContenido(@PathVariable Long id, @PathVariable Long contenidoId) {
-        Contenido contenido = contenidoService.get(contenidoId);
-        if (contenido != null && contenido.getSkill_id().equals(id)) {
-            contenidoService.delete(contenidoId);
-        }
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/controller/CategoriaController.java
-
-package com.skillmap.backend.controller;
-import com.skillmap.backend.model.Categoria;
-import com.skillmap.backend.service.CategoriaService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-@RestController
-@RequestMapping("/categorias")
-public class CategoriaController {
-    @Autowired
-    private CategoriaService categoriaService;
-    @PostMapping
-    public Categoria createCategoria(@RequestBody Categoria categoria) {
-        return categoriaService.createCategoria(categoria);
-    }
-    @GetMapping
-    public Iterable<Categoria> getAllCategorias() {
-        return categoriaService.getAllCategorias();
-    }
-    @PutMapping("/{id}")
-    public Categoria updateCategoria(@PathVariable Long id, @RequestBody Categoria categoria) {
-        return categoriaService.updateCategoria(id, categoria);
-    }
-    @DeleteMapping("/{id}")
-    public void deleteCategoria(@PathVariable Long id) {
-        categoriaService.deleteCategoria(id);
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/controller/ContenidoController.java
-
-package com.skillmap.backend.controller;
-import com.skillmap.backend.model.Contenido;
-import com.skillmap.backend.service.ContenidoService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-@RestController
-@RequestMapping("/api/contenido")
-public class ContenidoController {
-    @Autowired
-    private ContenidoService contenidoService;
-    @PostMapping
-    public Contenido create(@RequestBody Contenido contenido) {
-        return contenidoService.save(contenido);
-    }
-    @GetMapping("/{id}")
-    public Contenido get(@PathVariable Long id) {
-        return contenidoService.get(id);
-    }
-    @PutMapping
-    public Contenido update(@RequestBody Contenido contenido) {
-        return contenidoService.update(contenido);
-    }
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        contenidoService.delete(id);
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/controller/RolController.java
-
-package com.skillmap.backend.controller;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.skillmap.backend.model.Rol;
-import com.skillmap.backend.service.RolService;
-@RestController
-@RequestMapping("/api/roles")
-public class RolController {
-    private final RolService rolService;
-    @Autowired
-    public RolController(RolService rolService) {
-        this.rolService = rolService;
-    }
-    @PostMapping
-    public ResponseEntity<Rol> createRol(@RequestBody Rol rol) {
-        Rol savedRol = rolService.saveRol(rol);
-        return new ResponseEntity<>(savedRol, HttpStatus.CREATED);
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/controller/SkillMapController.java
-
-package com.skillmap.backend.controller;
-import com.skillmap.backend.model.SkillMap;
-import com.skillmap.backend.service.SkillMapService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-@RestController
-@RequestMapping("/api/skillmap")
-public class SkillMapController {
-    private final SkillMapService skillMapService;
-    @Autowired
-    public SkillMapController(SkillMapService skillMapService) {
-        this.skillMapService = skillMapService;
-    }
-    @PostMapping
-    public ResponseEntity<SkillMap> createSkillMap(@RequestBody SkillMap skillMap) {
-        return ResponseEntity.ok(skillMapService.saveSkillMap(skillMap));
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/repository/SkillMapRepository.java
-
-package com.skillmap.backend.repository;
-import com.skillmap.backend.model.SkillMap;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-@Repository
-public interface SkillMapRepository extends JpaRepository<SkillMap, Long> {
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/repository/ContenidoRepository.java
-
-package com.skillmap.backend.repository;
-import com.skillmap.backend.model.Contenido;
-import org.springframework.data.jpa.repository.JpaRepository;
-public interface ContenidoRepository extends JpaRepository<Contenido, Long> {
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/repository/SkillRepository.java
-
-package com.skillmap.backend.repository;
-import com.skillmap.backend.model.Skill;
-import org.springframework.data.repository.CrudRepository;
-public interface SkillRepository extends CrudRepository<Skill, Long> {
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/repository/RolRepository.java
-
-package com.skillmap.backend.repository;
-import org.springframework.data.jpa.repository.JpaRepository;
-import com.skillmap.backend.model.Rol;
-public interface RolRepository extends JpaRepository<Rol, Long> {
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/repository/CategoriaRepository.java
-
-package com.skillmap.backend.repository;
-import com.skillmap.backend.model.Categoria;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-@Repository
-public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
-    boolean existsByNombre(String nombre);
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/service/ContenidoService.java
-
-package com.skillmap.backend.service;
-import com.skillmap.backend.model.Contenido;
-import com.skillmap.backend.repository.ContenidoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-@Service
-public class ContenidoService {
-    @Autowired
-    private ContenidoRepository contenidoRepository;
-    public Contenido save(Contenido contenido) {
-        return contenidoRepository.save(contenido);
-    }
-    public Contenido get(Long id) {
-        return contenidoRepository.findById(id).orElse(null);
-    }
-    public Contenido update(Contenido contenido) {
-        return contenidoRepository.save(contenido);
-    }
-    public void delete(Long id) {
-        contenidoRepository.deleteById(id);
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/service/SkillService.java
-
-package com.skillmap.backend.service;
-import com.skillmap.backend.model.Contenido;
-import com.skillmap.backend.repository.ContenidoRepository;
-import com.skillmap.backend.repository.SkillRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-@Service
-public class SkillService {
-    @Autowired
-    private SkillRepository skillRepository;
-    @Autowired
-    private ContenidoRepository contenidoRepository;
-    // existing methods
-    public Contenido saveContenido(Contenido contenido) {
-        return contenidoRepository.save(contenido);
-    }
-    public Contenido getContenido(Long id) {
-        return contenidoRepository.findById(id).orElse(null);
-    }
-    public Contenido updateContenido(Contenido contenido) {
-        return contenidoRepository.save(contenido);
-    }
-    public void deleteContenido(Long id) {
-        contenidoRepository.deleteById(id);
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/service/SkillMapService.java
-
-package com.skillmap.backend.service;
-import com.skillmap.backend.model.SkillMap;
-import com.skillmap.backend.repository.SkillMapRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-@Service
-public class SkillMapService {
-    private final SkillMapRepository skillMapRepository;
-    @Autowired
-    public SkillMapService(SkillMapRepository skillMapRepository) {
-        this.skillMapRepository = skillMapRepository;
-    }
-    public SkillMap saveSkillMap(SkillMap skillMap) {
-        return skillMapRepository.save(skillMap);
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/service/RolService.java
-
-package com.skillmap.backend.service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.skillmap.backend.model.Rol;
-import com.skillmap.backend.repository.RolRepository;
-@Service
-public class RolService {
-    private final RolRepository rolRepository;
-    @Autowired
-    public RolService(RolRepository rolRepository) {
-        this.rolRepository = rolRepository;
-    }
-    public Rol saveRol(Rol rol) {
-        return rolRepository.save(rol);
-    }
-    public Iterable<Rol> getAllRoles() {
-        return rolRepository.findAll();
-    }
-}
-
-
-// Archivo: src/main/java/com/skillmap/backend/service/CategoriaService.java
-
-package com.skillmap.backend.service;
-import com.skillmap.backend.model.Categoria;
-import com.skillmap.backend.repository.CategoriaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-@Service
-public class CategoriaService {
-    @Autowired
-    private CategoriaRepository categoriaRepository;
-    public Categoria createCategoria(Categoria categoria) {
-        if (categoriaRepository.existsByNombre(categoria.getNombre())) {
-            throw new IllegalArgumentException("El nombre de la categoría ya existe");
-        }
-        return categoriaRepository.save(categoria);
-    }
-    public Iterable<Categoria> getAllCategorias() {
-        return categoriaRepository.findAll();
-    }
-    public Categoria updateCategoria(Long id, Categoria categoria) {
-        if (!categoriaRepository.existsById(id)) {
-            throw new IllegalArgumentException("La categoría no existe");
-        }
-        if (categoriaRepository.existsByNombre(categoria.getNombre())) {
-            throw new IllegalArgumentException("El nombre de la categoría ya existe");
-        }
-        categoria.setId(id);
-        return categoriaRepository.save(categoria);
-    }
-    public void deleteCategoria(Long id) {
-        if (!categoriaRepository.existsById(id)) {
-            throw new IllegalArgumentException("La categoría no existe");
-        }
-        categoriaRepository.deleteById(id);
-    }
-}
 
 
 // Archivo: src/main/java/com/skillmap/backend/BackendApplication.java
@@ -674,16 +127,40 @@ public class BackendApplication {
 	}
 
 }
-
+--- DISEÑO DEL FLUJO NECESARIO PARA LA HDU ---
+  Antes de analizar las clases existentes, define lo siguiente:
+  
+  1. ¿Cuál es la API REST esperada para implementar la historia de usuario? Define el o los endpoints requeridos, con sus métodos (GET/POST/etc), path y parámetros de entrada/salida.
+  
+  2. ¿Qué operaciones de negocio se requieren y cómo se deberían estructurar los servicios? Define los métodos clave del servicio y su lógica general.
+  
+  3. ¿Qué entidades (modelos o entidades JPA) se necesitan para representar los datos manejados por la historia de usuario? Enumera los nombres esperados y atributos principales.
+  
+  4. ¿Cuál sería el flujo general desde el Controller hasta el Repository y la Entity? Describe paso a paso cómo viaja la información, incluyendo las clases involucradas y cómo se relacionan.
+  
+  Este diseño preliminar será usado para identificar qué clases son necesarias.
+  
 --- ANÁLISIS DE CLASES EXISTENTES ---
-Genera una tabla Markdown como esta:
+Ahora, en base al diseño anterior, analiza las clases del proyecto actual y genera una tabla Markdown como esta:
 
 | Clase Java | Package | Clasificación | Motivo |
 |------------|---------|----------------|--------|
-| Employee | com.example.EmployeeCoreApi.model | REUTILIZABLE-AS-IS | Contiene atributo `gender` |
-| EmployeeServiceImpl | com.example.EmployeeCoreApi.service.impl | MODIFICABLE | Debe validar antes de borrar |
-| CannotDeleteEmployeeException | com.example.EmployeeCoreApi.exception | NUEVA | Requerida para lanzar excepción |
-| EmployeeServiceImplTest | com.example.EmployeeCoreApi.service.impl | NUEVA | Pruebas unitarias de validación |
+| Employee | com.example.EmployeeCoreApi.model | REUTILIZABLE-AS-IS | Contiene atributo `gender` utilizado para validación en el servicio |
+| EmployeeServiceImpl | com.example.EmployeeCoreApi.service.impl | MODIFICABLE | Se requiere agregar lógica de validación según la HDU |
+| CannotDeleteEmployeeException | com.example.EmployeeCoreApi.exception | NUEVA | Necesaria para lanzar error si se intenta borrar empleado no permitido |
+
+--- CRITERIOS IMPORTANTES ---
+- Solo deben incluirse en la tabla las clases que **realmente participan en el flujo de implementación** de la historia de usuario.
+- No incluyas clases que no se usan o que no están relacionadas con los pasos definidos anteriormente.
+- Una clase solo debe marcarse como `REUTILIZABLE-AS-IS` si se utiliza tal como está, sin modificaciones.
+- Si una clase ya existe pero necesita modificaciones, márcala como `MODIFICABLE` y explica por qué.
+- Si se necesita una clase que no existe, márcala como `NUEVA` y justifica su creación.
+- Usa el modelo de datos proporcionado en `modelo.sql` como referencia para las entidades.
+- No asumas la existencia de clases que no estén listadas ni presentes en el código entregado.
+
+--- FORMATO DE RESPUESTA ---
+Primero entrega el diseño de API, flujo y entidades como texto estructurado.
+Luego, entrega la tabla Markdown con la clasificación de clases relevantes.
 
 --- INSTRUCCIONES DE MODIFICACIÓN ---
 - No eliminar ni reemplazar lógica existente.
@@ -691,13 +168,22 @@ Genera una tabla Markdown como esta:
 - Solo generar clases nuevas si están indicadas como NUEVA.
 - Cada clase debe estar en su package correcto, según lo indicado en la tabla.
 - NO repetir clases ya existentes si no cambian.
-- NO eliminar los métodos existentes a menos que sea necesario
-- NO reemplazar métodos u otro contenido de las clases existentes por comentarios entre líneas
+- NO eliminar los métodos existentes a menos que sea necesario.
+- NO reemplazar métodos u otro contenido de las clases existentes por comentarios entre líneas.
 - Solo considerar como existente una clase si está listada explícitamente en "CLASES DISPONIBLES EN EL PROYECTO".
 - No debes asumir la existencia de clases que no aparecen explícitamente en la sección anterior. Si alguna clase no está listada entre las clases disponibles ni aparece en el código entregado, debe considerarse INEXISTENTE y marcada como NUEVA en el análisis.
 - Si una clase no aparece listada, asumir que es NUEVA.
-- Si una clase herada de otra clase o importa una interfaz propia del proyecto asegúrate que esta esté entre las clases existentes o genera el código respectivo de no existir previamente
+- Solo deben incluirse en el análisis (tabla Markdown) las clases que sean relevantes para implementar la historia de usuario evaluada. Esto incluye clases que serán reutilizadas, modificadas o sirven de base para nuevas clases (por ejemplo, clases base o entidades relacionadas).
+- Si una clase del proyecto no se usa en el flujo de la historia evaluada, NO la incluyas en la tabla, aunque esté disponible.
+- Una clase solo debe marcarse como `REUTILIZABLE-AS-IS` si va a ser efectivamente utilizada **sin modificaciones** como parte del cumplimiento de la historia de usuario.
+- El objetivo es enfocarse en el subconjunto mínimo de clases necesarias para implementar la funcionalidad, y no generar ruido con clases irrelevantes al caso de uso.          
+- Si una clase hereda de otra clase o importa una interfaz propia del proyecto asegúrate de que esta esté entre las clases existentes o genera el código respectivo de no existir previamente.
+- El archivo modelo.sql contiene la definición del modelo de datos. Úsalo como referencia para determinar qué entidades, atributos o estructuras deben mapearse a clases Java.
+- Si una tabla existe en el modelo.sql pero no tiene clase correspondiente en las clases existentes, debes proponer una clase NUEVA que la represente.
+- Si ya existe una clase que representa una tabla, debes indicar si puede reutilizarse o si debe modificarse, justificando tu decisión.
+- Utiliza nombres de clases y atributos consistentes con las tablas y columnas del modelo.sql, aplicando convenciones Java (camelCase, PascalCase).
+- Las clases sugeridas deben estar todas dentro de la tabla Markdown con el detalle de si es REUTILIZABLE-AS-IS, MODIFICABLE o NUEVA.
 
 --- CÓDIGO A GENERAR ---
-Devuelve solo clases Java válidas. Cada bloque debe comenzar con `package ...`.
+Devuelve solo clases Java válidas. Cada  bloque debe comenzar con `package ...`.
 Incluye los tests JUnit5 en el mismo formato si aplica.
