@@ -1,17 +1,20 @@
-- id: HDU002
-  title: Crear y gestionar skills asociados a categorías
-  descripcion: Como administrador, quiero poder definir skills técnicos (como Java,
-    Jenkins, Docker) agrupados en categorías, para luego asignarlos a roles.
-  entidad: Skill
-  campos:
-  - id
-  - nombre
-  - categoria_id
-  acciones:
-  - POST
-  - GET
-  - PUT
-  - DELETE
-  validaciones:
-  - nombre obligatorio
-  - referencia válida a categoria
+## HDU002 — Editar categoría de skills
+
+**Historia de Usuario:**  
+*Como Admin de talento, quiero **editar el nombre de una categoría existente**, para **mantener la coherencia y la comprensión de la taxonomía de skills***.
+
+**Criterios de Aceptación:**
+- Dado que soy un Admin de talento autenticado,  
+  Cuando selecciono una categoría y actualizo su nombre con uno válido,  
+  Entonces el sistema guarda el nuevo nombre y lo refleja en la lista de categorías.
+- Dado que el nuevo nombre ya existe,  
+  Cuando intento guardar los cambios,  
+  Entonces el sistema muestra un mensaje "El nombre de la categoría ya está en uso" y no actualiza la categoría.
+- Dado que cancelo la edición,  
+  Cuando hago clic en "Cancelar",  
+  Entonces el sistema descarta los cambios y mantiene el nombre original.
+
+**Notas Adicionales:**  
+- Historial de cambios opcional para auditoría.
+
+**Prioridad:** TBD
