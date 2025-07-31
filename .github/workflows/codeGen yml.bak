@@ -225,7 +225,7 @@ jobs:
           - Asegúrate que la cantidad de métodos de las clases modificadas sea mayor o igual a la cantidad de métodos de la clase antes de la modificación
           - Cada clase debe comenzar con `package ...`.
           - Devuelve únicamente clases y tests JUnit 5 válidos.
-          - No incluyas explicaciones ni comentarios adicionales.
+          - No incluyas  explicaciones ni comentarios adicionales.
           - NO eliminar los métodos existentes a menos que sea necesario.
           - NO reemplazar métodos u otro contenido de las clases existentes por comentarios entre líneas.
           - Si una clase existente implementa una interfaz, o hereda de otra clase, debes mantener esa declaración `implements o extends ...`.
