@@ -33,6 +33,7 @@ jobs:
 
       - name: SonarCloud Scan
         run: |
+          mkdir -p src/test/java  # crea carpeta vacía si no existe
           mvn sonar:sonar \
             -Dsonar.projectKey=$SONAR_PROJECT_KEY \
             -Dsonar.organization=$SONAR_ORGANIZATION \
