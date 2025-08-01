@@ -1,4 +1,4 @@
-name: Build + Sonar + Webhook
+name: Build + Sonar + Informe
 
 on:
   push:
@@ -25,6 +25,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Diagnóstico de fuentes presentes
+        run: |
+            echo "== Archivos .java =="
+            find . -name "*.java"
+            echo "== Archivos .class =="
+            find . -name "*.class"
+            
       - name: Build (captura de log)
         id: build
         run: |
