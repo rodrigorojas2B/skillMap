@@ -1,0 +1,66 @@
+name: Build + Sonar + Webhook
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-sonar:
+    runs-on: ubuntu-latest
+
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      GH_PAT: ${{ secrets.GH_PAT }}
+      WEBHOOK_URL: http://localhost:5678/webhook-test/github-build-result
+      SONAR_PROJECT_KEY: rodrigorojasg_testSpring
+      SONAR_ORGANIZATION: rodrigorojasg
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Instalar Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build (captura de log)
+        id: build
+        run: |
+          mvn clean install > build.log 2>&1 || echo "BUILD_FAILED=1" >> $GITHUB_ENV
+
+      - name: SonarCloud Scan
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+            -Dsonar.organization=$SONAR_ORGANIZATION \
+            -Dsonar.projectName="testSpring Original" \
+            -Dsonar.sources=src/main/java \
+            -Dsonar.tests=src/test \
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=$SONAR_TOKEN || echo "SONAR_FAILED=1" >> $GITHUB_ENV
+
+      - name: Obtener errores Sonar
+        if: success() || failure()
+        run: |
+          curl -s "https://sonarcloud.io/api/issues/search?componentKeys=$SONAR_PROJECT_KEY&severities=BLOCKER,CRITICAL,MAJOR" > sonar_issues.json
+          jq -c '{issues: [.issues[] | {severity, rule, message, component, line}]}' sonar_issues.json > sonar_filtered.json
+
+      - name: Enviar reporte a n8n
+        if: always()
+        run: |
+          BUILD_LOG=$(tail -n 100 build.log | jq -R -s .)
+          SONAR_ERRORS=$(cat sonar_filtered.json)
+          curl -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "build_result": "${{ job.status }}",
+              "conclusion": "${{ job.conclusion }}",
+              "commit": "${{ github.sha }}",
+              "workflow_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+              "build_log": '"$BUILD_LOG"',
+              "sonar_errors": '"$SONAR_ERRORS"'
+            }'
