@@ -1,0 +1,81 @@
+name: Build + Sonar + Webhook
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-sonar:
+    runs-on: ubuntu-latest
+
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      GH_PAT: ${{ secrets.GH_PAT }}
+      WEBHOOK_URL: http://localhost:5678/webhook-test/github-build-result
+      SONAR_PROJECT_KEY: rodrigorojasg_testSpring
+      SONAR_ORGANIZATION: rodrigorojasg
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Instalar Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build (captura de log)
+        id: build
+        run: |
+          mvn clean install > build.log 2>&1 || echo "BUILD_FAILED=1" >> $GITHUB_ENV
+
+      - name: SonarCloud Scan
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+            -Dsonar.organization=$SONAR_ORGANIZATION \
+            -Dsonar.projectName="testSpring Original" \
+            -Dsonar.sources=src/main/java \
+            -Dsonar.tests=src/test \
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=$SONAR_TOKEN || echo "SONAR_FAILED=1" >> $GITHUB_ENV
+
+      - name: Obtener errores Sonar
+        if: success() || failure()
+        run: |
+          curl -s "https://sonarcloud.io/api/issues/search?componentKeys=$SONAR_PROJECT_KEY&severities=BLOCKER,CRITICAL,MAJOR" > sonar_issues.json
+          jq -c '{issues: [.issues[] | {severity, rule, message, component, line}]}' sonar_issues.json > sonar_filtered.json
+
+      - name: Guardar resultado como JSON y subir como artifact
+        if: always()
+        run: |
+          mkdir -p salida
+          BUILD_LOG=$(tail -n 100 build.log | jq -R -s .)
+          SONAR_ERRORS=$(cat sonar_filtered.json)
+          RUN_NUMBER=$GITHUB_RUN_NUMBER
+          RUN_ID=$GITHUB_RUN_ID
+          REPO=$GITHUB_REPOSITORY
+          COMMIT=$GITHUB_SHA
+
+          PAYLOAD_FILE="salida/salida${RUN_NUMBER}.json"
+
+          cat <<EOF > $PAYLOAD_FILE
+            {
+            "build_result": "finalizado",
+            "conclusion": "terminado",
+            "commit": "${COMMIT}",
+            "workflow_url": "https://github.com/${REPO}/actions/runs/${RUN_ID}",
+            "build_log": $BUILD_LOG,
+            "sonar_errors": $SONAR_ERRORS
+            }
+            EOF
+
+      - name: Subir resultado como artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultado-${{ github.run_number }}
+          path: salida/salida${{ github.run_number }}.json
