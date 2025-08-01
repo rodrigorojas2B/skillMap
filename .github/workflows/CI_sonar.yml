@@ -39,6 +39,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
+          mkdir -p src/test/java  # crea carpeta vacía si no existe
           mvn sonar:sonar \
             -Dsonar.projectKey=rodrigorojasg_testSpring \
             -Dsonar.organization=rodrigorojasg \
