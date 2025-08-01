@@ -12,8 +12,8 @@ jobs:
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       GH_PAT: ${{ secrets.GH_PAT }}
-      SONAR_PROJECT_KEY: rodrigorojasg_testSpring
-      SONAR_ORGANIZATION: rodrigorojasg
+      SONAR_PROJECT_KEY: rodrigorojas2B_skillMap
+      SONAR_ORGANIZATION: rodrigorojas2b
 
     steps:
       - name: Checkout código
