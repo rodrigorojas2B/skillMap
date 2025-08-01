@@ -12,7 +12,6 @@ jobs:
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       GH_PAT: ${{ secrets.GH_PAT }}
-      WEBHOOK_URL: http://localhost:5678/webhook-test/github-build-result
       SONAR_PROJECT_KEY: rodrigorojasg_testSpring
       SONAR_ORGANIZATION: rodrigorojasg
 
@@ -80,5 +79,12 @@ jobs:
                     \"sonar_errors\": $SONAR_ERRORS
                 }" > $PAYLOAD_FILE
             fi
+
+      - name: Subir resultado como artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultado-${{ github.run_number }}
+          path: salida/salida${{ github.run_number }}.json
   
   
