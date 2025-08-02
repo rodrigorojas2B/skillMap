@@ -57,7 +57,7 @@ jobs:
           curl -s "https://sonarcloud.io/api/issues/search?componentKeys=$SONAR_PROJECT_KEY&severities=BLOCKER,CRITICAL,MAJOR" > sonar_issues.json
           jq -c '{issues: [.issues[] | {severity, rule, message, component, line}]}' sonar_issues.json > sonar_filtered.json
 
-      - name: Guardar resultado como JSON y subir como artifact
+      - name: Guardar resultado como JSON
         if: always()
         run: |
             mkdir -p salida
@@ -66,12 +66,13 @@ jobs:
             RUN_ID=$GITHUB_RUN_ID
             REPO=$GITHUB_REPOSITORY
             COMMIT=$GITHUB_SHA
-            PAYLOAD_FILE="salida/salida${RUN_NUMBER}.json"
-  
+            PAYLOAD_FILE="salida/resultado.json"
+        
             if [[ "$BUILD_FAILED" == "1" ]]; then
               BUILD_RESULT="falló"
               BUILD_LOG=$(tail -n 100 build.log | jq -R -s .)
               echo "{
+                    \"run_number\": $RUN_NUMBER,
                     \"build_result\": \"$BUILD_RESULT\",
                     \"commit\": \"$COMMIT\",
                     \"workflow_url\": \"https://github.com/$REPO/actions/runs/$RUN_ID\",
@@ -81,18 +82,19 @@ jobs:
             else
               BUILD_RESULT="ok"
               echo "{
+                    \"run_number\": $RUN_NUMBER,
                     \"build_result\": \"$BUILD_RESULT\",
                     \"commit\": \"$COMMIT\",
                     \"workflow_url\": \"https://github.com/$REPO/actions/runs/$RUN_ID\",
                     \"sonar_errors\": $SONAR_ERRORS
                 }" > $PAYLOAD_FILE
             fi
-
-      - name: Subir resultado como artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: resultado-${{ github.run_number }}
-          path: salida/salida${{ github.run_number }}.json
-  
-  
+        
+      - name: Subir JSON al repo
+        run: |
+            git config --global user.email "bot@example.com"
+            git config --global user.name "CI Bot"
+            git add salida/resultado.json
+            git commit -m "ci: resultado de análisis"
+            git push
+        
