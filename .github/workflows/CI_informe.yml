@@ -40,7 +40,18 @@ jobs:
       - name: Build (captura de log)
         id: build
         run: |
-          mvn clean verify 2>&1 | tee build.log || echo "BUILD_FAILED=1" >> $GITHUB_ENV
+            set -o pipefail
+            mvn clean verify 2>&1 | tee build.log
+        continue-on-error: true
+
+      - name: Evaluar estado de build
+        if: always()
+        run: |
+            if grep -q "\[INFO\] BUILD FAILURE" build.log; then
+            echo "BUILD_FAILED=1" >> $GITHUB_ENV
+            else
+            echo "BUILD_FAILED=0" >> $GITHUB_ENV
+            fi
 
       - name: SonarCloud Scan
         run: |
