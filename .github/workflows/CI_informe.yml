@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout código
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
 
       - name: Instalar Java
         uses: actions/setup-java@v3
@@ -92,9 +94,8 @@ jobs:
         
       - name: Subir JSON al repo
         run: |
-            git config --global user.email "bot@example.com"
-            git config --global user.name "CI Bot"
-            git add salida/resultado.json
-            git commit -m "ci: resultado de análisis"
-            git push
-        
+              git config --global user.email "bot@example.com"
+              git config --global user.name "CI Bot"
+              git add salida/resultado.json
+              git commit -m "ci: resultado de análisis" || echo "Sin cambios para commitear"
+              git push
