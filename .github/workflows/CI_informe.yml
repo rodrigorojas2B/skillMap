@@ -85,7 +85,6 @@ jobs:
             COMMIT=$GITHUB_SHA
             PAYLOAD_FILE="salida/resultado.json"
 
-            
             if [[ "$BUILD_FAILED" == "1" ]]; then
               BUILD_RESULT="falló"
               BUILD_LOG=$(tail -n 100 build.log | jq -R -s .)
