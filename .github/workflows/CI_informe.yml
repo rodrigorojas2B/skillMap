@@ -67,6 +67,7 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=$SONAR_TOKEN || echo "SONAR_FAILED=1" >> $GITHUB_ENV
 
+            
       - name: Obtener errores Sonar
         if: success() || failure()
         run: |
