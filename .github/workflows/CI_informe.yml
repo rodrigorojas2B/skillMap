@@ -44,6 +44,7 @@ jobs:
             mvn clean verify 2>&1 | tee build.log
         continue-on-error: true
 
+        
       - name: Evaluar estado de build
         if: always()
         run: |
