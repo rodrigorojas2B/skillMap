@@ -3,6 +3,8 @@ package com.skillmap.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,5 +30,5 @@ public class Skill {
     private Set<SkillMap> skillMaps;
 
     @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<SkillEval> skillEvals;
+    private Set<SkillFit> skillFits;
 }
