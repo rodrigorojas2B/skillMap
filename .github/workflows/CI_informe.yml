@@ -40,127 +40,138 @@ jobs:
 
       - name: Generar colección Postman desde controllers
         run: |
-          set -e
-          mkdir -p postman
-          python3 - <<'PY'
-          import os, re, json, pathlib, sys
-
-          SRC = pathlib.Path("src/main/java")
-          OUT_DIR = pathlib.Path("postman")
-          OUT_DIR.mkdir(parents=True, exist_ok=True)
-          OUT_FILE = OUT_DIR / "skillmap.postman_collection.json"
-
-          def clean_quotes(s):
-              s = s.strip()
-              if s.startswith('"') and s.endswith('"'): s = s[1:-1]
-              if s.startswith("'") and s.endswith("'"): s = s[1:-1]
-              return s
-
-          def norm_path(p):
-              if not p: return ""
-              p = p.strip()
-              p = p if p.startswith("/") else f"/{p}"
-              return re.sub(r'//+', "/", p)
-
-          def join_path(a, b):
-              if not a: return norm_path(b or "/")
-              if not b: return norm_path(a)
-              return norm_path(a.rstrip("/") + "/" + b.lstrip("/"))
-
-          re_class = re.compile(r'public\s+(?:abstract\s+|final\s+)?class\s+([A-Za-z_]\w*)')
-          re_rest = re.compile(r'@\s*(?:RestController|Controller)\b')
-          re_class_req = re.compile(
-              r'@RequestMapping\s*\(\s*'
-              r'(?:value|path)?\s*=\s*(?P<q>["\'])(?P<val>.+?)(?P=q)|'
-              r'(?:path|value)\s*=\s*\{(?P<arr>[^}]+)\}|'
-              r'(?P<noparms>)\s*'
-              r'\)', re.S
-          )
-          verbs = ['Get','Post','Put','Delete','Patch']
-          re_method_map = re.compile(
-              r'@(?P<verb>'+ '|'.join(verbs) + r')Mapping\s*'
-              r'\(\s*'
-              r'(?:[^)]*?(?:value|path)\s*=\s*(?P<q>["\'])(?P<val>.+?)(?P=q)[^)]*|'
-              r'[^)]*?)'
-              r'\)', re.S
-          )
-          re_reqmap_method = re.compile(
-              r'@RequestMapping\s*\(\s*[^)]*?method\s*=\s*RequestMethod\.(?P<verb>[A-Z]+)[^)]*?'
-              r'(?:value|path)\s*=\s*(?P<q>["\'])(?P<val>.+?)(?P=q)[^)]*\)', re.S
-          )
-
-          items = []
-          if not SRC.exists():
-              print("WARN: No existe src/main/java. Se creará colección vacía.", file=sys.stderr)
-          else:
-              for java in SRC.rglob("*Controller.java"):
-                  try:
-                      txt = java.read_text(encoding="utf-8", errors="ignore")
-                  except Exception as e:
-                      print(f"WARN: No se pudo leer {java}: {e}", file=sys.stderr)
-                      continue
-                  if not re_rest.search(txt):
-                      continue
-                  m_class = re_class.search(txt)
-                  class_name = m_class.group(1) if m_class else java.stem
-                  pre_class = txt[:m_class.start()] if m_class else txt
-                  m_cls_req = re_class_req.search(pre_class)
-                  class_prefix = ""
-                  if m_cls_req:
-                      if m_cls_req.group("val"):
-                          class_prefix = clean_quotes(m_cls_req.group("val"))
-                      elif m_cls_req.group("arr"):
-                          first = m_cls_req.group("arr").split(",")[0].strip()
-                          class_prefix = clean_quotes(first)
-                      class_prefix = norm_path(class_prefix)
-                  for mm in re_method_map.finditer(txt):
-                      verb = mm.group("verb").upper()
-                      path = clean_quotes(mm.group("val") or "")
-                      items.append((class_name, verb, join_path(class_prefix, path)))
-                  for mm in re_reqmap_method.finditer(txt):
-                      verb = mm.group("verb").upper()
-                      path = clean_quotes(mm.group("val") or "")
-                      items.append((class_name, verb, join_path(class_prefix, path)))
-
-          coll = {
-              "info": {
-                  "name": "SkillMap API (auto)",
-                  "_postman_id": "auto-generated",
-                  "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-              },
-              "item": [],
-              "variable": [{"key":"baseUrl","value":"http://localhost:8080"}]
-          }
-
-          from collections import defaultdict
-          groups = defaultdict(list)
-          for cname, verb, path in sorted(set(items), key=lambda x:(x[0],x[1],x[2])):
-              groups[cname].append((verb, path))
-
-          def to_item(verb, path):
-              raw = "{{baseUrl}}" + norm_path(path or "/")
-              return {
-                  "name": f"{verb} {norm_path(path or '/')}",
-                  "request": {
-                      "method": verb,
-                      "header": [{"key":"Accept","value":"application/json"}],
-                      "url": {
-                          "raw": raw,
-                          "host": ["{{baseUrl}}"],
-                          "path": [p for p in norm_path(path or "/").split("/") if p]
+              set -e
+              mkdir -p postman
+              python3 - <<'PY'
+              import os, re, json, pathlib, sys
+              SRC = pathlib.Path("src/main/java")
+              OUT = pathlib.Path("postman/skillmap.postman_collection.json")
+              OUT.parent.mkdir(parents=True, exist_ok=True)
+    
+              def clean(s):
+                  s = s.strip()
+                  if (s.startswith('"') and s.endswith('"')) or (s.startswith("'") and s.endswith("'")):
+                      return s[1:-1]
+                  return s
+    
+              def norm(p):
+                  if not p: return ""
+                  p = p if p.startswith("/") else "/"+p
+                  return re.sub(r"/{2,}", "/", p)
+    
+              def join(a,b):
+                  if not a: return norm(b or "/")
+                  if not b: return norm(a)
+                  return norm(a.rstrip("/") + "/" + b.lstrip("/"))
+    
+              # --- helpers para extraer paths en anotaciones ---
+              # Busca value|path="..."  | value|path={"...","..."} | 1er string posicional "..."
+              def first_path(args:str)->str:
+                  if not args: return ""
+                  m = re.search(r'(?:\bvalue\b|\bpath\b)\s*=\s*(["\'])(.+?)\1', args, re.S)
+                  if m: return clean(m.group(2))
+                  m = re.search(r'(?:\bvalue\b|\bpath\b)\s*=\s*\{(.*?)\}', args, re.S)
+                  if m:
+                      q = re.search(r'(["\'])(.+?)\1', m.group(1))
+                      if q: return clean(q.group(2))
+                  q = re.search(r'(["\'])(.+?)\1', args, re.S)  # posicional
+                  if q: return clean(q.group(2))
+                  return ""
+    
+              def verbs_in_requestmapping(args:str):
+                  # Devuelve lista de verbos (GET,POST,...) si hay method=RequestMethod.X {,…}
+                  if not args: return []
+                  vs = re.findall(r'RequestMethod\.([A-Z]+)', args)
+                  return [v.upper() for v in vs]
+    
+              # --- patrones para encontrar anotaciones ---
+              re_class      = re.compile(r'\bpublic\s+(?:abstract\s+|final\s+)?class\s+([A-Za-z_]\w*)')
+              re_controller = re.compile(r'@\s*(?:RestController|Controller)\b')
+              re_ann        = lambda name: re.compile(r'@'+name+r'\s*(?:\((?P<args>.*?)\))?', re.S)
+    
+              GET = re_ann('GetMapping'); POST = re_ann('PostMapping'); PUT = re_ann('PutMapping')
+              DELETE = re_ann('DeleteMapping'); PATCH = re_ann('PatchMapping')
+              REQ = re_ann('RequestMapping')
+    
+              items = []
+    
+              if SRC.exists():
+                  for f in SRC.rglob('*Controller.java'):
+                      txt = f.read_text(encoding='utf-8', errors='ignore')
+                      if not re_controller.search(txt):  # seguridad
+                          continue
+    
+                      mcls = re_class.search(txt)
+                      cname = mcls.group(1) if mcls else f.stem
+    
+                      # Prefijo de clase: primer @RequestMapping antes de la declaración de class
+                      class_prefix = ""
+                      head = txt[:mcls.start()] if mcls else txt
+                      mhead = REQ.search(head)
+                      if mhead:
+                          class_prefix = norm(first_path(mhead.group('args')))
+    
+                      def collect(name, regex, verb_fixed=None):
+                          for mm in regex.finditer(txt):
+                              args = mm.group('args') or ""
+                              path = first_path(args)
+                              full = join(class_prefix, path)
+                              if verb_fixed:
+                                  items.append((cname, verb_fixed, full))
+                              else:
+                                  vs = verbs_in_requestmapping(args)
+                                  if vs:
+                                      for v in vs:
+                                          items.append((cname, v, full))
+    
+                      collect('GetMapping', GET, 'GET')
+                      collect('PostMapping', POST, 'POST')
+                      collect('PutMapping', PUT, 'PUT')
+                      collect('DeleteMapping', DELETE, 'DELETE')
+                      collect('PatchMapping', PATCH, 'PATCH')
+                      collect('RequestMapping', REQ, None)   # usa method=RequestMethod.*
+    
+              # Construir colección Postman
+              from collections import defaultdict
+              groups = defaultdict(list)
+              for cname, verb, path in sorted(set(items), key=lambda x:(x[0],x[1],x[2])):
+                  groups[cname].append((verb, path))
+    
+              coll = {
+                  "info": {
+                      "name": "SkillMap API (auto)",
+                      "_postman_id": "auto-generated",
+                      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+                  },
+                  "item": [],
+                  "variable": [{"key":"baseUrl","value":"http://localhost:8080"}]
+              }
+    
+              def to_item(verb, path):
+                  raw = "{{baseUrl}}" + norm(path or "/")
+                  return {
+                      "name": f"{verb} {norm(path or '/')}",
+                      "request": {
+                          "method": verb,
+                          "header": [{"key":"Accept","value":"application/json"}],
+                          "url": {
+                              "raw": raw,
+                              "host": ["{{baseUrl}}"],
+                              "path": [p for p in norm(path or "/").split('/') if p]
+                          }
                       }
                   }
-              }
-
-          if groups:
-              for cname, routes in groups.items():
-                  coll["item"].append({"name": cname, "item": [to_item(v,p) for v,p in routes]})
-          else:
-              coll["item"] = [{"name":"(sin rutas detectadas)","item":[]}]
-
-          OUT_FILE.write_text(json.dumps(coll, indent=2, ensure_ascii=False))
-          print(f"Generada colección: {OUT_FILE}")
-          PY
+    
+              if groups:
+                  for cname, routes in groups.items():
+                      coll["item"].append({"name": cname, "item": [to_item(v,p) for v,p in routes]})
+              else:
+                  coll["item"] = [{"name":"(sin rutas detectadas)","item":[]}]
+    
+              OUT.write_text(json.dumps(coll, ensure_ascii=False, indent=2))
+              print(f"[postman] Generada colección con {sum(len(v) for v in groups.values())} endpoints → {OUT}")
+              PY
+    
 
       - name: Verificar carpeta y archivo Postman
         if: always()
