@@ -37,6 +37,154 @@ jobs:
             find . -name "*.java"
             echo "== Archivos .class =="
             find . -name "*.class"
+            
+      # ======= NUEVO: Generar colección Postman =======
+      - name: Generar colección Postman desde controllers
+        run: |
+          set -e
+          mkdir -p postman
+          python3 - <<'PY'
+          import os, re, json, pathlib
+
+          SRC = pathlib.Path("src/main/java")
+          OUT_DIR = pathlib.Path("postman")
+          OUT_DIR.mkdir(parents=True, exist_ok=True)
+          OUT_FILE = OUT_DIR / "skillmap.postman_collection.json"
+
+          # Utilidades
+          def clean_quotes(s):
+              s = s.strip()
+              if s.startswith('"') and s.endswith('"'): s = s[1:-1]
+              if s.startswith("'") and s.endswith("'"): s = s[1:-1]
+              return s
+
+          def norm_path(p):
+              if not p: return ""
+              p = p.strip()
+              p = p if p.startswith("/") else f"/{p}"
+              p = re.sub(r'//+', "/", p)
+              return p
+
+          def join_path(a, b):
+              if not a: return norm_path(b or "/")
+              if not b: return norm_path(a)
+              return norm_path(a.rstrip("/") + "/" + b.lstrip("/"))
+
+          # Regex básicos
+          re_class = re.compile(r'public\s+(?:abstract\s+|final\s+)?class\s+([A-Za-z_]\w*)')
+          re_rest = re.compile(r'@\s*(?:RestController|Controller)\b')
+          re_class_req = re.compile(
+              r'@RequestMapping\s*\(\s*'
+              r'(?:value|path)?\s*=\s*(?P<q>["\'])(?P<val>.+?)(?P=q)|'  # value="..."
+              r'(?:path|value)\s*=\s*\{(?P<arr>[^}]+)\}|'
+              r'(?P<noparms>)\s*'
+              r'\)', re.S
+          )
+          # Métodos abreviados
+          verbs = ['Get','Post','Put','Delete','Patch']
+          re_method_map = re.compile(
+              r'@(?P<verb>'+ '|'.join(verbs) + r')Mapping\s*'
+              r'\(\s*'
+              r'(?:[^)]*?(?:value|path)\s*=\s*(?P<q>["\'])(?P<val>.+?)(?P=q)[^)]*|'
+              r'[^)]*?)'
+              r'\)', re.S
+          )
+          # RequestMapping a nivel método con RequestMethod.X
+          re_reqmap_method = re.compile(
+              r'@RequestMapping\s*\(\s*[^)]*?method\s*=\s*RequestMethod\.(?P<verb>[A-Z]+)[^)]*?'
+              r'(?:value|path)\s*=\s*(?P<q>["\'])(?P<val>.+?)(?P=q)[^)]*\)', re.S
+          )
+
+          items = []
+
+          for java in SRC.rglob("*Controller.java"):
+              txt = java.read_text(encoding="utf-8", errors="ignore")
+              # Verifica que sea un Controller
+              if not re_rest.search(txt):
+                  continue
+
+              # Nombre de clase
+              m_class = re_class.search(txt)
+              class_name = m_class.group(1) if m_class else java.stem
+
+              # Prefijo de clase (primer @RequestMapping antes de class)
+              class_prefix = ""
+              # Busca @RequestMapping antes del 'class'
+              pre_class = txt[:m_class.start()] if m_class else txt
+              m_cls_req = re_class_req.search(pre_class)
+              if m_cls_req:
+                  if m_cls_req.group("val"):
+                      class_prefix = clean_quotes(m_cls_req.group("val"))
+                  elif m_cls_req.group("arr"):
+                      # toma el primer elemento del array {"a","b"}
+                      first = m_cls_req.group("arr").split(",")[0].strip()
+                      class_prefix = clean_quotes(first)
+                  class_prefix = norm_path(class_prefix)
+
+              # Métodos abreviados
+              for mm in re_method_map.finditer(txt):
+                  verb = mm.group("verb").upper()
+                  path = clean_quotes(mm.group("val") or "")
+                  full = join_path(class_prefix, path)
+                  items.append((class_name, verb, full))
+
+              # Métodos con RequestMethod
+              for mm in re_reqmap_method.finditer(txt):
+                  verb = mm.group("verb").upper()
+                  path = clean_quotes(mm.group("val") or "")
+                  full = join_path(class_prefix, path)
+                  items.append((class_name, verb, full))
+
+          # Construir colección Postman v2.1
+          coll = {
+              "info": {
+                  "name": "SkillMap API (auto)",
+                  "_postman_id": "auto-generated",
+                  "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+              },
+              "item": [],
+              "variable": [
+                  {"key": "baseUrl", "value": "http://localhost:8080"}
+              ]
+          }
+
+          # Agrupa por controlador
+          from collections import defaultdict
+          groups = defaultdict(list)
+          for cname, verb, path in sorted(set(items), key=lambda x: (x[0], x[1], x[2])):
+              groups[cname].append((verb, path))
+
+          def to_item(verb, path):
+              raw = "{{baseUrl}}" + norm_path(path or "/")
+              # path parts for postman
+              parts = [p for p in raw.split("/") if p and p != "{{baseUrl}}"]
+              return {
+                  "name": f"{verb} {norm_path(path or '/')}",
+                  "request": {
+                      "method": verb,
+                      "header": [{"key": "Accept", "value": "application/json"}],
+                      "url": {
+                          "raw": raw,
+                          "host": ["{{baseUrl}}"],
+                          "path": [p for p in norm_path(path or "/").split("/") if p]
+                      }
+                  }
+              }
+
+          for cname, routes in groups.items():
+              folder = {
+                  "name": cname,
+                  "item": [to_item(v, p) for (v, p) in routes]
+              }
+              coll["item"].append(folder)
+
+          # Si no se encontraron rutas, crea colección mínima
+          if not coll["item"]:
+              coll["item"] = [{"name":"(sin rutas detectadas)","item":[]}]
+
+          OUT_FILE.write_text(json.dumps(coll, indent=2, ensure_ascii=False))
+          print(f"Generada colección: {OUT_FILE}")
+          PY
 
       - name: Build (captura de log)
         id: build
