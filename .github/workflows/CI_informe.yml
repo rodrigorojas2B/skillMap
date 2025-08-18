@@ -54,6 +54,7 @@ jobs:
             echo "BUILD_FAILED=0" >> $GITHUB_ENV
             fi
 
+            
       - name: SonarCloud Scan
         run: |
           mkdir -p src/test/java  # crea carpeta vacía si no existe
