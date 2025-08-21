@@ -1,0 +1,19 @@
+{
+  "info": {
+    "name": "SkillMap API (auto)",
+    "_postman_id": "auto-generated",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "(sin rutas detectadas)",
+      "item": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ]
+}
