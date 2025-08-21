@@ -1,4 +1,3 @@
-// Clase NUEVA: CategoriaMapper
 package com.skillmap.backend.mapper;
 
 import com.skillmap.backend.dto.CategoriaDTO;

@@ -1,4 +1,3 @@
-// Clase NUEVA: CategoriaController
 package com.skillmap.backend.controller;
 
 import com.skillmap.backend.dto.CategoriaDTO;

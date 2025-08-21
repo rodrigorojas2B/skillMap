@@ -1,4 +1,3 @@
-// Clase NUEVA: CategoriaService
 package com.skillmap.backend.service;
 
 import com.skillmap.backend.dto.CategoriaDTO;
